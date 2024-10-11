@@ -1,0 +1,6 @@
+boto3
+python-dotenv
+anthropic
+openai
+geopy
+requests
