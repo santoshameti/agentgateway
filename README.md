@@ -116,39 +116,85 @@ For more examples, check the `examples/` directory.
 
 To add a new tool:
 
-1. Create a new file in the `tools/` directory (e.g., `my_new_tool.py`).
-2. Define a new class that inherits from `AuthenticatedTool`.
-3. Implement the `execute` and `get_parameters_schema` methods.
-4. Add any necessary authentication logic in the `set_auth` method.
+1. Create a new file in the `tools/` directory (e.g., `calendar_search_tool.py`).
+2. Define a new class that inherits from `Tool` (from `core.abstract_tool`).
+3. Implement the required methods: `execute`, `get_parameters_schema`, and `is_auth_setup`.
+4. Add any necessary authentication logic.
 
-Example:
+Example of a hypothetical CalendarSearchTool:
 
 ```python
 from typing import Dict, Any
-from .authenticated_tool import AuthenticatedTool
+from core.abstract_tool import Tool
+from some_calendar_api import CalendarAPI  # Hypothetical calendar API
 
-class MyNewTool(AuthenticatedTool):
+class CalendarSearchTool(Tool):
     def __init__(self):
-        super().__init__("my_new_tool", "Description of what my new tool does")
+        super().__init__("calendar_search", "Search for events in a calendar")
+        self.api = None
 
-    def execute(self, parameters: Dict[str, Any]) -> Any:
-        # Implement the tool's functionality here
-        pass
+    def is_auth_setup(self):
+        return self.api is not None
+
+    def execute(self) -> Any:
+        if not self.is_auth_setup():
+            raise ValueError("Calendar API not set up. Use set_auth() to set up the API.")
+        
+        parameters = self.get_parameters()
+        start_date = parameters.get('start_date')
+        end_date = parameters.get('end_date')
+        search_term = parameters.get('search_term')
+
+        events = self.api.search_events(start_date, end_date, search_term)
+        return [self.format_event(event) for event in events]
 
     def get_parameters_schema(self) -> Dict[str, Any]:
         return {
             "type": "object",
             "properties": {
-                "param1": {"type": "string", "description": "Description of param1"},
-                "param2": {"type": "integer", "description": "Description of param2"}
+                "start_date": {
+                    "type": "string",
+                    "description": "Start date for the search (ISO format)"
+                },
+                "end_date": {
+                    "type": "string",
+                    "description": "End date for the search (ISO format)"
+                },
+                "search_term": {
+                    "type": "string",
+                    "description": "Optional search term to filter events"
+                }
             },
-            "required": ["param1", "param2"]
+            "required": ["start_date", "end_date"]
         }
 
     def set_auth(self, **kwargs):
-        # Implement any necessary authentication logic here
-        pass
+        api_key = kwargs.get('api_key')
+        if not api_key:
+            raise ValueError("API key is required for CalendarSearchTool")
+        self.api = CalendarAPI(api_key)
+
+    def format_event(self, event):
+        return {
+            "title": event.title,
+            "start": event.start_time.isoformat(),
+            "end": event.end_time.isoformat(),
+            "location": event.location
+        }
 ```
+
+To use the new tool:
+
+1. Instantiate the tool: `calendar_tool = CalendarSearchTool()`
+2. Set up authentication: `calendar_tool.set_auth(api_key=os.getenv('CALENDAR_API_KEY'))`
+3. Add the tool to your agent when creating it:
+   ```python
+   agent = gateway.create_agent(prompt, tools=[calendar_tool, other_tools...])
+   ```
+
+When using the tool, ensure that you handle the tool's parameters correctly in your agent's logic and provide the necessary authentication details.
+
+Remember to import and initialize any required libraries or APIs (in this example, the hypothetical `CalendarAPI`) in your actual implementation.
 
 ## Contributing
 
