@@ -1,2 +1,5 @@
+.DS_Store
+.Idea
+tests/.DS_Store
 .env
 .venv/*

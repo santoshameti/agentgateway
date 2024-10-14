@@ -196,6 +196,88 @@ When using the tool, ensure that you handle the tool's parameters correctly in y
 
 Remember to import and initialize any required libraries or APIs (in this example, the hypothetical `CalendarAPI`) in your actual implementation.
 
+## Running Tests
+
+To run the tests for this project, follow these steps:
+
+1. Ensure you have pytest installed. If not, install it using:
+   ```
+   pip install -r requirements.txt
+   ```
+
+2. From the root directory of the project (agentgateway), run:
+   ```
+   python -m pytest
+   ```
+
+This command will discover and run all tests in the `tests/` directory, including tests for tools and the tool manager.
+
+To run tests with more detailed output, you can use the `-v` (verbose) flag:
+```
+python -m pytest -v
+```
+
+To see print statements and other output during test execution, use the `-s` flag:
+```
+python -m pytest -s
+```
+
+You can combine these flags for even more detailed output:
+```
+python -m pytest -v -s
+```
+
+To run tests for specific components:
+
+- For all tool tests:
+  ```
+  python -m pytest tests/tools/
+  ```
+
+- For specific tools:
+  ```
+  python -m pytest tests/tools/test_askuser_tool.py
+  python -m pytest tests/tools/test_calculator_tool.py
+  python -m pytest tests/tools/test_translation_tool.py
+  python -m pytest tests/tools/test_weather_tool.py
+  ```
+
+- For the tool manager:
+  ```
+  python -m pytest tests/test_tool_manager.py
+  ```
+
+- For all adapter tests:
+  ```
+  python -m pytest tests/adapters/
+  ```
+
+- For specific adapter:
+  ```
+  python -m pytest tests/tools/test_<adapter_name>.py
+  ```
+- For the agent gateway:
+  ```
+  python -m pytest tests/test_agent_gateway.py
+   ``` 
+
+Remember to write comprehensive tests for each component to ensure proper functionality and integration.
+
+## Note on Project Structure
+
+Make sure your project structure follows the layout described in this README. The tests expect the tools to be in a module named `agentgateway`, so your directory structure should reflect this.
+
+## Note on Mocking
+
+Some tests, particularly for the WeatherTool and TranslationTool, use mocking to simulate external API calls. This ensures that tests can run without actually making network requests, which makes them faster and more reliable.
+
+When running these tests, make sure you have the `unittest.mock` module available (it's included in Python's standard library for Python 3.3 and newer).
+
+
+## Continuous Integration
+
+Consider setting up a CI/CD pipeline that runs these tests automatically on each commit or pull request. This will help catch any regressions early in the development process.
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
