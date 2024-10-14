@@ -111,7 +111,3 @@ class ToolManager:
             return isinstance(value, dict)
         else:
             return True  # For any other types, we'll assume it's valid
-
-    def execute_tool(self, tool_data: Dict[str, Any]) -> Any:
-        tool = self.get_tool(tool_data)
-        return tool.execute(tool_data['input'])
