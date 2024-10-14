@@ -29,6 +29,8 @@ This project implements a flexible AI Agent Gateway that supports multiple AI ba
 │   ├── openai_gpt_adapter.py
 │   ├── bedrock_converse_adapter.py
 │   └── ... (other adapter files)
+├── tests/
+│   ├── ... (test files)
 ├── tools/
 │   ├── __init__.py
 │   ├── ask_user_tool.py
