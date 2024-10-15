@@ -123,9 +123,11 @@ class AbstractAgent(ABC):
         :param role: The role of the message sender (e.g., "user", "assistant", "system").
         :param content: The content of the message.
         """
-        self.conversation_history.append({"role": role, "content": content})
-
-    def get_formatted_tool_output(self, id, tool_output):
+        if role is not None:
+            self.conversation_history.append({"role": role, "content": content})
+        else:
+            self.conversation_history.append(content)
+    def get_formatted_tool_output(self, tool, tool_output):
         pass
     def get_formatted_conversation_history(self) -> str:
         """

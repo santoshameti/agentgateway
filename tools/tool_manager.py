@@ -1,3 +1,4 @@
+import json
 from typing import Dict, Any
 from core.abstract_tool import Tool
 from tools.askuser_tool import AskUserTool
@@ -15,6 +16,8 @@ class ToolManager:
         self.logging.info("ToolManager:get_tool:function called")
         tool_name = tool_data.get('name')
         input_params = tool_data.get('input', {})
+        if isinstance(input_params, str):
+            input_params = json.loads(input_params)
         instance_id = tool_data.get('id')
         self.logging.info(f"ToolManager:get_tool:tool name requested {tool_name}")
 

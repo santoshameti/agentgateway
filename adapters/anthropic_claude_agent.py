@@ -120,8 +120,8 @@ class AnthropicClaudeAgent(AbstractAgent):
 
         return response
 
-    def get_formatted_tool_output(self, id, tool_output):
-        return {"type": "tool_result", "tool_use_id": id, "content": tool_output}
+    def get_formatted_tool_output(self, tool, tool_output):
+        return {"type": "tool_result", "tool_use_id": tool.instance_id, "content": tool_output}
 
     def get_tools(self, response) -> []:
         self.logging.info(f"AnthropicClaudeAgent:get_tools: function called")

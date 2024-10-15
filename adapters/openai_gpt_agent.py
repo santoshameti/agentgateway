@@ -79,8 +79,8 @@ class OpenAIGPTAgent(AbstractAgent):
         self.logging.info(f"OpenAIAgent:get_tools: compiled the tools and returning")
         return tools
 
-    def get_formatted_tool_output(self, id, tool_output):
-        return {"role": "tool", "tool_call_id": id, "content": json.dumps(tool_output)}
+    def get_formatted_tool_output(self, tool, tool_output):
+        return {"role": "tool", "tool_call_id": tool.instance_id, "content": json.dumps(tool_output)}
 
     def run(self, agent_input, is_tool_response) -> Response:
         self.logging.info("OpenAIAgent:run:Running OpenAI Agent")

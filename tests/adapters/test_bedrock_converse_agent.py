@@ -70,7 +70,9 @@ class TestBedrockConverseAgent(unittest.TestCase):
         self.assertEqual(response.content, "Test response")
 
     def test_get_formatted_tool_output(self):
-        formatted_output = self.agent.get_formatted_tool_output("tool_id", "Tool output")
+        mock_tool = MagicMock(spec=Tool)
+        mock_tool.instance_id = "tool_id"
+        formatted_output = self.agent.get_formatted_tool_output(mock_tool, "Tool output")
         self.assertEqual(formatted_output, {
             "toolResult": {
                 "toolUseId": "tool_id",

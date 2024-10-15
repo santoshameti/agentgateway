@@ -8,12 +8,14 @@ from utils.agent_logger import AgentLogger
 from adapters.anthropic_claude_agent import AnthropicClaudeAgent
 from adapters.openai_gpt_agent import OpenAIGPTAgent
 from adapters.bedrock_converse_agent import BedrockConverseAgent
+#from adapters.groq_agent import GroqAgent
 
 class AgentType(Enum):
     BEDROCK = "bedrock"
     OPENAI = "openai"
     VERTEX = "vertex"
     ANTHROPIC = "anthropic"
+    GROQ = "groq"
 
 class UnsupportedAgentException(Exception):
     def __init__(self, agent_type):
@@ -44,6 +46,9 @@ class AgentGateway:
         elif agent_type == AgentType.ANTHROPIC:
             self.adapter = AnthropicClaudeAgent(model_id)
             return self.adapter
+#        elif agent_type == AgentType.GROQ:
+#            self.adapter = GroqAgent(model_id)
+#            return self.adapter
         elif agent_type == AgentType.VERTEX:
             pass
         else:
@@ -91,7 +96,7 @@ class AgentGateway:
                         response_tool_auth = self.tools[response_tool_name].get_auth()
                         response_tool.set_auth(**response_tool_auth)
                         tool_output = response_tool.execute()
-                        formatted_tool_output = self.adapter.get_formatted_tool_output(id=response_tool.instance_id,tool_output=tool_output)
+                        formatted_tool_output = self.adapter.get_formatted_tool_output(tool=response_tool,tool_output=tool_output)
                         tool_results.append(formatted_tool_output)
                         self.logging.info(f"AgentGateway:run_agent: {response_tool.get_name()} tool output: {tool_output}")
                     else:

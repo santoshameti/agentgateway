@@ -41,7 +41,9 @@ class TestOpenAIGPTAgent(unittest.TestCase):
         self.assertEqual(self.agent.formatted_tools[0]["function"]["name"], "test_tool")
 
     def test_get_formatted_tool_output(self):
-        formatted_output = self.agent.get_formatted_tool_output("tool_id", "Tool output")
+        mock_tool = MagicMock(spec=Tool)
+        mock_tool.instance_id = "tool_id"
+        formatted_output = self.agent.get_formatted_tool_output(mock_tool, "Tool output")
         self.assertEqual(formatted_output, {
             "role": "tool",
             "tool_call_id": "tool_id",

@@ -153,10 +153,10 @@ class BedrockConverseAgent(AbstractAgent):
         self.logging.info("BedrockConverseAgent:get_tools: compiled the tools and returning")
         return tools
 
-    def get_formatted_tool_output(self, id, tool_output):
+    def get_formatted_tool_output(self, tool, tool_output):
         return {
                 "toolResult": {
-                    "toolUseId": id,
+                    "toolUseId": tool.instance_id,
                     "content": [{"text": json.dumps(tool_output)}],
                     "status": "success"
                 }
