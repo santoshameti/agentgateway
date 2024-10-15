@@ -1,5 +1,5 @@
 from openai import OpenAI, ChatCompletion
-import json
+import json, traceback
 from typing import List, Dict, Any
 
 from openai.types.chat import ChatCompletionMessageToolCall
@@ -71,7 +71,6 @@ class OpenAIGPTAgent(AbstractAgent):
                 self.logging.info(f"OpenAIAgent:get_tools: tool instance 'name': {item.function.name} 'input': {tool_input}")
                 tool_info = {'name': item.function.name, 'input': tool_input, 'id': item.id}
 
-                print(tool_info)
                 tool = tool_manager.get_tool(tool_info)
                 self.logging.info(f"OpenAIAgent:get_tools: tool instance 'name': {item.function.name} created")
                 tools.append(tool)
@@ -84,7 +83,6 @@ class OpenAIGPTAgent(AbstractAgent):
         return {"role": "tool", "tool_call_id": id, "content": json.dumps(tool_output)}
 
     def run(self, agent_input, is_tool_response) -> Response:
-        print (f"agent_input: {agent_input} is_tool_response: {is_tool_response}")
         self.logging.info("OpenAIAgent:run:Running OpenAI Agent")
         response = Response()
         if not self.client:
@@ -93,9 +91,7 @@ class OpenAIGPTAgent(AbstractAgent):
         if not is_tool_response:
             self.add_to_conversation_history("user", agent_input)
         elif is_tool_response:
-            print("agent input: tool response detected")
             self.conversation_history.extend(agent_input)
-            print(self.conversation_history)
 
         messages = [
             {"role": "system", "content": self.instructions},
@@ -105,8 +101,7 @@ class OpenAIGPTAgent(AbstractAgent):
                **({"tool_call_id": msg["tool_call_id"]} if "tool_call_id" in msg else {}),
 } for msg in self.conversation_history]
         ]
-        print ("messages compiled")
-        print(messages)
+
         self.logging.info(f"OpenAIAgent:run:invoking the selected model {self.model_id}")
         try:
             model_response = self.client.chat.completions.create(
@@ -116,20 +111,15 @@ class OpenAIGPTAgent(AbstractAgent):
                 temperature=self.model_config['temperature'],
                 tools=self.formatted_tools
             )
-            print("model response")
-            print(model_response)
+
             self.logging.info(f"OpenAIAgent:run:model invoke completed")
             finish_reason = model_response.choices[0].finish_reason
-
             if finish_reason != "tool_calls":
                 assistant_message = model_response.choices[0].message.content
                 self.add_to_conversation_history("assistant", assistant_message)
             else:
                 assistant_message = self.generate_assistant_message_for_toolcalls(model_response.choices[0].message)
                 self.conversation_history.append(assistant_message)
-
-            print("assistant message below")
-            print(assistant_message)
 
             if finish_reason == "tool_calls":
                 self.logging.info(f"OpenAIAgent:run: function call detected")
@@ -139,7 +129,6 @@ class OpenAIGPTAgent(AbstractAgent):
                 response.set_tools(tools)
                 self.logging.info(f"OpenAIAgent:run: tools extracted")
 
-                print(tools)
             elif finish_reason == "stop":
                 response.set_response_type(ResponseType.ANSWER)
                 response.set_content(assistant_message)
@@ -154,7 +143,6 @@ class OpenAIGPTAgent(AbstractAgent):
                 response.set_content(f"Unexpected finish reason: {finish_reason}")
 
         except Exception as e:
-            print(f"exception {e}")
             response.set_response_type(ResponseType.ERROR)
             response.set_content(str(e))
 
@@ -192,5 +180,4 @@ class OpenAIGPTAgent(AbstractAgent):
                 }
             }
             assistant_message["tool_calls"].append(tool_call_message)
-        print(assistant_message)
         return assistant_message
