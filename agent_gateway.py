@@ -8,7 +8,7 @@ from utils.agent_logger import AgentLogger
 from adapters.anthropic_claude_agent import AnthropicClaudeAgent
 from adapters.openai_gpt_agent import OpenAIGPTAgent
 from adapters.bedrock_converse_agent import BedrockConverseAgent
-#from adapters.groq_agent import GroqAgent
+from adapters.groq_agent import GroqAgent
 
 class AgentType(Enum):
     BEDROCK = "bedrock"
@@ -46,9 +46,9 @@ class AgentGateway:
         elif agent_type == AgentType.ANTHROPIC:
             self.adapter = AnthropicClaudeAgent(model_id)
             return self.adapter
-#        elif agent_type == AgentType.GROQ:
-#            self.adapter = GroqAgent(model_id)
-#            return self.adapter
+        elif agent_type == AgentType.GROQ:
+            self.adapter = GroqAgent(model_id)
+            return self.adapter
         elif agent_type == AgentType.VERTEX:
             pass
         else:
