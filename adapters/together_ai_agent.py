@@ -78,8 +78,6 @@ class TogetherAIAgent(AbstractAgent):
 
         response = Response()
 
-        print (f"agent input: {agent_input}, is tool_response: {is_tool_response}")
-
         try:
             if not is_tool_response:
                 self.add_to_conversation_history("user", agent_input)
@@ -90,10 +88,6 @@ class TogetherAIAgent(AbstractAgent):
                 {"role": "system", "content": self.instructions}
             ]
             messages.extend(self.conversation_history)
-            print("messages")
-            print(messages)
-            print("tools")
-            print(self.formatted_tools)
 
             together_response = self.client.chat.completions.create(
                 model=self.model_id,
@@ -102,15 +96,10 @@ class TogetherAIAgent(AbstractAgent):
                 tool_choice="auto",
                 **self.model_config
             )
-            print (together_response)
+
             response_data = together_response
-
-            print("response")
-            print(response_data)
-
             assistant_message = response_data.choices[0].message
             self.conversation_history.append(assistant_message)
-            print(assistant_message)
             finish_reason = response_data.choices[0].finish_reason
             if finish_reason == "tool_calls":
                 self.logging.info("TogetherAIAgent:run: function call detected")
