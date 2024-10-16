@@ -9,6 +9,7 @@ from adapters.anthropic_claude_agent import AnthropicClaudeAgent
 from adapters.openai_gpt_agent import OpenAIGPTAgent
 from adapters.bedrock_converse_agent import BedrockConverseAgent
 from adapters.groq_agent import GroqAgent
+from adapters.together_ai_agent import TogetherAIAgent
 
 class AgentType(Enum):
     BEDROCK = "bedrock"
@@ -16,6 +17,7 @@ class AgentType(Enum):
     VERTEX = "vertex"
     ANTHROPIC = "anthropic"
     GROQ = "groq"
+    TOGETHER = "together"
 
 class UnsupportedAgentException(Exception):
     def __init__(self, agent_type):
@@ -48,6 +50,9 @@ class AgentGateway:
             return self.adapter
         elif agent_type == AgentType.GROQ:
             self.adapter = GroqAgent(model_id)
+            return self.adapter
+        elif agent_type == AgentType.TOGETHER:
+            self.adapter = TogetherAIAgent(model_id)
             return self.adapter
         elif agent_type == AgentType.VERTEX:
             pass
