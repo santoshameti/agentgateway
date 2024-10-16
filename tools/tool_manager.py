@@ -5,8 +5,11 @@ from tools.askuser_tool import AskUserTool
 from tools.weather_tool import WeatherTool
 from tools.calculator_tool import CalculatorTool
 from tools.translate_tool import TranslationTool
+from tools.web_search_tool import WebSearchTool
 from utils.agent_logger import AgentLogger
-
+from tools.sentiment_analysis_tool import SentimentAnalysisTool
+from tools.topic_detection_tool import TopicDetectionTool
+from tools.text_summarization_tool import TextSummarizationTool
 
 class ToolManager:
     def __init__(self):
@@ -29,6 +32,14 @@ class ToolManager:
             tool = CalculatorTool()
         elif tool_name == "translate":
             tool = TranslationTool()
+        elif tool_name == "web_search":
+            tool = WebSearchTool()
+        elif tool_name == "analyze_sentiment":
+            tool = SentimentAnalysisTool()
+        elif tool_name == "detect_topics":
+            tool = TopicDetectionTool()
+        elif tool_name == "summarize_text":
+            tool = TextSummarizationTool()
         else:
             self.logging.info(f"ToolManager:get_tool:Tool name not found {tool_name}")
             raise ValueError(f"Unknown tool: {tool_name}")
