@@ -2,7 +2,7 @@
 
 ## Overview
 
-Agentgateway goal is to get you started with AI agents in the simplest way possible by abstracting out all complexity. This project implements a flexible AI Agent Gateway that supports LLMs from multiple AI backends including OpenAI(GPT and O1), Anthropic (Claude), Bedrock(Claude, Llama, Mistral etc), and Vertex AI (coming soon). It provides a unified interface for creating and running AI agents with various tools.
+Agentgateway goal is to get you started with AI agents in the simplest way possible by abstracting out all complexity. This project implements a flexible AI Agent Gateway that supports LLMs from multiple AI backends including OpenAI(GPT and O1), Anthropic (Claude), Bedrock(Claude, Llama, Mistral etc), Groq (Mistral, Llama), Together(Mistral, Llama), Fireworks(Mistral, Llama) and Vertex AI (coming soon). It provides a unified interface for creating and running AI agents with various tools.
 
 ## Features
 
