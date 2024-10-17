@@ -39,6 +39,7 @@ Here's a diagram illustrating the structure of an agent:
     </marker>
   </defs>
 </svg>
+
 ## Abstract Agent
 
 The `AbstractAgent` class serves as the base class for all agent implementations. It defines the common interface and functionality that all agents should have. Here's a detailed overview of the `AbstractAgent` class:
