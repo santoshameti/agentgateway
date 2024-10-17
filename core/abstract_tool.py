@@ -1,3 +1,4 @@
+import copy
 from abc import ABC, abstractmethod
 from typing import Dict, Any
 
@@ -126,3 +127,14 @@ class Tool(ABC):
 
     def get_name(self) -> str:
         return self.name
+
+    def clone(self):
+        """
+        Create a deep copy of the tool.
+        :return: A new instance of the tool with copied attributes.
+        """
+        new_tool = copy.deepcopy(self)
+        # Reset or reinitialize certain attributes as needed
+        new_tool.instance_id = ""
+        return new_tool
+
