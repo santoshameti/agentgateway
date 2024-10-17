@@ -281,7 +281,7 @@ Consider setting up a CI/CD pipeline that runs these tests automatically on each
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please feel free to submit a Pull Request. Check out our [contribution guidelines](docs/contributing.md).
 
 ## License
 
