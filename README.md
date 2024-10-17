@@ -74,6 +74,8 @@ Agentgateway goal is to get you started with AI agents in the simplest way possi
    AWS_ACCESS_API=your_aws_api_key
    AWS_SECRET_KEY=your_aws_secret_access_key
    AWS_REGION_ID=your_aws_region
+   TOGETHER_API_KEY=your_together_api_key
+   FIREWORKS_API_KEY=your_together_api_key
    ```
 
 ## Usage
@@ -238,10 +240,7 @@ To run tests for specific components:
 
 - For specific tools:
   ```
-  python -m pytest tests/tools/test_askuser_tool.py
-  python -m pytest tests/tools/test_calculator_tool.py
-  python -m pytest tests/tools/test_translation_tool.py
-  python -m pytest tests/tools/test_weather_tool.py
+  python -m pytest tests/tools/test_<tool_name>.py
   ```
 
 - For the tool manager:
