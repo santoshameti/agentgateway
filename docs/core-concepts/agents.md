@@ -12,8 +12,33 @@ An agent consists of three main components:
 
 Here's a diagram illustrating the structure of an agent:
 
-[... Keep the existing SVG diagram here ...]
-
+<antArtifact identifier="agent-diagram" type="image/svg+xml" title="Agent Structure Diagram">
+<svg viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
+  <rect x="50" y="50" width="500" height="300" fill="#f0f0f0" stroke="#000000" stroke-width="2"/>
+  <text x="300" y="30" text-anchor="middle" font-size="24" font-weight="bold">Agent</text>
+  <!-- Instructions -->
+  <rect x="75" y="75" width="150" height="100" fill="#b3e0ff" stroke="#000000" stroke-width="2"/>
+  <text x="150" y="130" text-anchor="middle" font-size="18">Instructions</text>
+  <!-- Tools -->
+  <rect x="250" y="75" width="150" height="100" fill="#ffd9b3" stroke="#000000" stroke-width="2"/>
+  <text x="325" y="130" text-anchor="middle" font-size="18">Tools</text>
+  <!-- User Input -->
+  <rect x="75" y="200" width="450" height="50" fill="#d9f2d9" stroke="#000000" stroke-width="2"/>
+  <text x="300" y="230" text-anchor="middle" font-size="18">User Input</text>
+  <!-- Output -->
+  <rect x="75" y="275" width="450" height="50" fill="#ffcccc" stroke="#000000" stroke-width="2"/>
+  <text x="300" y="305" text-anchor="middle" font-size="18">Output</text>
+  <!-- Arrows -->
+  <path d="M150 175 L150 200" stroke="#000000" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <path d="M325 175 L325 200" stroke="#000000" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <path d="M300 250 L300 275" stroke="#000000" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+  <!-- Arrowhead definition -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" />
+    </marker>
+  </defs>
+</svg>
 ## Abstract Agent
 
 The `AbstractAgent` class serves as the base class for all agent implementations. It defines the common interface and functionality that all agents should have. Here's a detailed overview of the `AbstractAgent` class:
