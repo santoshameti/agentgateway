@@ -12,9 +12,11 @@ class Response:
     def __init__(self, 
                  response_type: ResponseType = None,
                  content: str = None,
+                 conversation_id: Optional[str] = None
                  ):
         self.response_type = response_type
         self.content = content
+        self.conversation_id = conversation_id
         self.tools = []
 
     def __str__(self):
@@ -32,9 +34,16 @@ class Response:
     def set_tools(self, tools: list):
         self.tools = tools
 
+    def get_conversation_id(self) -> Optional[str]:
+        return self.conversation_id
+
+    def set_conversation_id(self, conversation_id: str):
+        self.conversation_id = conversation_id
+
     def to_dict(self):
         return {
             "type": self.response_type.value,
             "content": self.content,
-            "tools": self.tools
+            "tools": self.tools,
+            "conversation_id": self.conversation_id
         }
