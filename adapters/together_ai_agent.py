@@ -76,12 +76,13 @@ class TogetherAIAgent(AbstractAgent):
             raise ValueError("Authentication not set. Please call set_auth() before running the agent.")
 
         response = Response()
+        response.set_conversation_id(self.current_conversation_id)
 
         try:
             if not is_tool_response:
-                self.add_to_conversation_history("user", agent_input)
+                self.add_to_conversation_history({"role":"user", "content":agent_input})
             else:
-                self.conversation_history.extend(agent_input)
+                self.extend_conversation_history(agent_input)
 
             messages = [
                 {"role": "system", "content": self.instructions}
@@ -98,7 +99,7 @@ class TogetherAIAgent(AbstractAgent):
 
             response_data = together_response
             assistant_message = response_data.choices[0].message
-            self.conversation_history.append(assistant_message)
+            self.add_to_conversation_history(assistant_message)
             finish_reason = response_data.choices[0].finish_reason
             if finish_reason == "tool_calls":
                 self.logging.info("TogetherAIAgent:run: function call detected")

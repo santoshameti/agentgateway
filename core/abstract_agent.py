@@ -135,17 +135,20 @@ class AbstractAgent(ABC):
         """
         self.conversation_history = []
 
-    def add_to_conversation_history(self, role: str, content, conversation_id: Optional[str] = None):
+    def add_to_conversation_history(self, message: Dict[str, Any], conversation_id: Optional[str] = None):
         """
         Add a new message to the conversation history.
         :param role: The role of the message sender (e.g., "user", "assistant", "system").
         :param content: The content of the message.
-        """
+
         if role is not None:
             self.conversation_history.append({"role": role, "content": content})
         else:
-            self.conversation_history.append(content)
+        """
+        self.conversation_history.append(message)
 
+    def extend_conversation_history(self, messages:[List], conversation_id: Optional[str] = None):
+        self.conversation_history.extend(messages)
 
     def get_formatted_tool_output(self, tool, tool_output):
         pass

@@ -83,22 +83,20 @@ class OpenAIGPTAgent(AbstractAgent):
     def run(self, agent_input, is_tool_response: Optional[bool] = False, conversation_id: Optional[str] = None) -> Response:
         self.logging.info("OpenAIAgent:run:Running OpenAI Agent")
         response = Response()
+        response.set_conversation_id(self.current_conversation_id)
+
         if not self.client:
             raise ValueError("Authentication not set. Please call set_auth() before running the agent.")
 
         if not is_tool_response:
-            self.add_to_conversation_history("user", agent_input)
+            self.add_to_conversation_history({"role":"user", "content":agent_input})
         elif is_tool_response:
-            self.conversation_history.extend(agent_input)
+            self.extend_conversation_history(agent_input)
 
         messages = [
-            {"role": "system", "content": self.instructions},
-            *[{"role": msg["role"],
-               **({"content": msg["content"]} if "content" in msg else {}),
-               **({"tool_calls": msg["tool_calls"]} if "tool_calls" in msg else {}),
-               **({"tool_call_id": msg["tool_call_id"]} if "tool_call_id" in msg else {}),
-} for msg in self.conversation_history]
+            {"role": "system", "content": self.instructions}
         ]
+        messages.extend(self.conversation_history)
 
         self.logging.info(f"OpenAIAgent:run:invoking the selected model {self.model_id}")
         try:
@@ -117,7 +115,7 @@ class OpenAIGPTAgent(AbstractAgent):
                 self.add_to_conversation_history("assistant", assistant_message)
             else:
                 assistant_message = self.generate_assistant_message_for_toolcalls(model_response.choices[0].message)
-                self.conversation_history.append(assistant_message)
+                self.add_to_conversation_history(assistant_message)
 
             if finish_reason == "tool_calls":
                 self.logging.info(f"OpenAIAgent:run: function call detected")

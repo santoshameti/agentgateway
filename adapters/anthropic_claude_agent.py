@@ -74,12 +74,10 @@ class AnthropicClaudeAgent(AbstractAgent):
         if not self.client:
             raise ValueError("Authentication not set. Please call set_auth() before running the agent.")
 
-        self.add_to_conversation_history("user", agent_input)
+        self.add_to_conversation_history({"role":"user", "content": agent_input})
 
-        messages = [
-            *[{"role": msg["role"], "content": msg["content"]} for msg in self.conversation_history]
-        ]
         response = Response()
+        response.set_conversation_id(self.current_conversation_id)
 
         self.logging.info(f"AnthropicClaudeAgent:run:invoking the selected model {self.model_id}")
         try:
@@ -88,14 +86,14 @@ class AnthropicClaudeAgent(AbstractAgent):
                 system=self.instructions,
                 max_tokens=self.model_config['max_tokens'],
                 temperature=self.model_config['temperature'],
-                messages=messages,
+                messages=self.conversation_history,
                 tools=self.formatted_tools,
                 tool_choice={"type": "auto"}
             )
 
             self.logging.info(f"AnthropicClaudeAgent:run:model invoke completed")
             assistant_message = self.get_model_response(model_response.content)
-            self.add_to_conversation_history("assistant", model_response.content)
+            self.add_to_conversation_history({"role":"assistant", "content":model_response.content})
             if model_response.stop_reason == "tool_use":
                 self.logging.info(f"AnthropicClaudeAgent:run: tool use detected")
                 response.set_response_type(ResponseType.TOOL_CALL)

@@ -81,21 +81,18 @@ class BedrockConverseAgent(AbstractAgent):
             raise ValueError("Authentication not set. Please call set_auth() before running the agent.")
 
         response = Response()
+        response.set_conversation_id(self.current_conversation_id)
 
         try:
             if not is_tool_response:
-                self.add_to_conversation_history("user", [{"text": agent_input}])
+                self.add_to_conversation_history({"role":"user","content": [{"text": agent_input}]})
             else:
-                self.add_to_conversation_history("user", agent_input)
-
-            messages = [
-                *[{"role": msg["role"], "content": msg["content"]} for msg in self.conversation_history]
-            ]
+                self.add_to_conversation_history({"role":"user", "content":agent_input})
 
             body = {
                 "modelId": self.model_id,
                 "system" : [{"text": self.instructions}],
-                "messages": messages,
+                "messages": self.conversation_history,
                 "toolConfig": {
                     "tools": self.formatted_tools,
                 },
@@ -110,7 +107,7 @@ class BedrockConverseAgent(AbstractAgent):
             bedrock_response = self.client.converse(**body)
 
             assistant_message = bedrock_response['output']['message']['content']
-            self.add_to_conversation_history("assistant", assistant_message)
+            self.add_to_conversation_history({"role":"assistant", "content":assistant_message})
 
             if bedrock_response['stopReason'] == "tool_use":
                 self.logging.info("BedrockConverseAgent:run: tool use detected")

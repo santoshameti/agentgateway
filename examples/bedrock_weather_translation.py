@@ -47,9 +47,9 @@ try:
     gateway.start_conversation()
     result_3 = gateway.run_agent(agent_input_no_params)
     print(result_3)
-    gateway.start_conversation()
-    result_4 = gateway.run_agent(multiple_inputs)
-    print(f" Agent input: {multiple_inputs}, Agent output: {result_4}")
+#   gateway.start_conversation()
+#    result_4 = gateway.run_agent(multiple_inputs)
+#    print(f" Agent input: {multiple_inputs}, Agent output: {result_4}")
 except Exception as e:
     print(str(e))
 

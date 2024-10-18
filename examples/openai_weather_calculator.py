@@ -35,10 +35,11 @@ multiple_inputs = "Translate to Hindi and Get me weather"
 try:
 #    result_1 = gateway.run_agent(agent_input_1tool)
 #    print(f" Agent input: {agent_input_1tool}, Agent output: {result_1}")
-#    result_2 = gateway.run_agent(agent_input_2tools)
-#    print(f" Agent input: {agent_input_2tools}, Agent output: {result_2}")
+    result_2 = gateway.run_agent(agent_input_2tools)
+    print(f" Agent input: {agent_input_2tools}, Agent output: {result_2}")
 #    result_3 = gateway.run_agent(agent_input_no_params)
 #    print(f" Agent input: {agent_input_no_params}, Agent output: {result_3}")
+    gateway.start_conversation()
     result_4 = gateway.run_agent(multiple_inputs)
     print(f" Agent input: {multiple_inputs}, Agent output: {result_4}")
 except Exception as e:
