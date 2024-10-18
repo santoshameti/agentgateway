@@ -105,17 +105,14 @@ class AgentGateway:
                 for response_tool in response_tools:
                     self.logging.info(f"AgentGateway:run_agent: executing tool {response_tool.name} and id {response_tool.instance_id}")
                     if response_tool.name in self.tools:
-                        # get the auth and set the auth to execute
                         self.logging.info(f"AgentGateway:run_agent: setting the auth params for the agents to execute")
-                        response_tool_name = response_tool.name
-                        response_tool_auth = self.tools[response_tool_name].get_auth()
-                        response_tool.set_auth(**response_tool_auth)
                         tool_output = response_tool.execute()
                         formatted_tool_output = self.adapter.get_formatted_tool_output(tool=response_tool,tool_output=tool_output)
                         tool_results.append(formatted_tool_output)
                         self.logging.info(f"AgentGateway:run_agent: {response_tool.get_name()} tool output: {tool_output}")
                     else:
-                        self.logging.info(f"AgentGateway:run_agent: invalid tool {response_tool.get_name()} returned by Agent")
+                        # TODO: retrigger LLM call with the error to fix the issue
+                        self.logging.error(f"AgentGateway:run_agent: invalid tool {response_tool.get_name()} returned by Agent")
                         raise UnsupportedAgentException(f"{response_tool.get_name()} returned by Agent")
                     self.logging.info(f"AgentGateway:run_agent:Agent execution completed")
 
