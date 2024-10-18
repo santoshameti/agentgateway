@@ -1,11 +1,10 @@
 import anthropic
 import json
-from typing import List, Dict, Any, Type
+from typing import List, Dict, Any, Type, Optional
 from core.abstract_agent import AbstractAgent
 from core.abstract_tool import Tool
 from core.response import Response, ResponseType
 from anthropic.types import ToolUseBlock, TextBlock
-from tools.tool_manager import ToolManager
 from utils.agent_logger import AgentLogger
 
 
@@ -68,9 +67,9 @@ class AnthropicClaudeAgent(AbstractAgent):
             }
         }
         self.formatted_tools.append(formatted_tool)
-        self.tools.append(formatted_tool)
+        self.tools[tool.name] = tool
 
-    def run(self, agent_input, is_tool_response) -> Response:
+    def run(self, agent_input, is_tool_response: Optional[bool] = False, conversation_id: Optional[str] = None) -> Response:
         self.logging.info("AnthropicClaudeAgent:run:Running Anthropic Claude Agent")
         if not self.client:
             raise ValueError("Authentication not set. Please call set_auth() before running the agent.")
@@ -93,6 +92,7 @@ class AnthropicClaudeAgent(AbstractAgent):
                 tools=self.formatted_tools,
                 tool_choice={"type": "auto"}
             )
+
             self.logging.info(f"AnthropicClaudeAgent:run:model invoke completed")
             assistant_message = self.get_model_response(model_response.content)
             self.add_to_conversation_history("assistant", model_response.content)
@@ -102,12 +102,6 @@ class AnthropicClaudeAgent(AbstractAgent):
                 tools = self.get_tools(model_response.content)
                 response.set_tools(tools)
                 self.logging.info(f"AnthropicClaudeAgent:run: tools extracted")
-                #check if ask_user tool is used
-                for tool in tools:
-                    if tool.name == "ask_user":
-                        response.set_response_type(ResponseType.ASK_USER)
-                        response.set_content(tool.get_parameter("question"))
-                        response.set_tools([tool])
             elif model_response.stop_reason == "end_turn":
                 response.set_response_type(ResponseType.ANSWER)
                 response.set_content(assistant_message)
@@ -125,13 +119,12 @@ class AnthropicClaudeAgent(AbstractAgent):
 
     def get_tools(self, response) -> []:
         self.logging.info(f"AnthropicClaudeAgent:get_tools: function called")
-        tool_manager = ToolManager()
         tools = []
         for item in response:
             if isinstance(item, ToolUseBlock):
                 self.logging.info(f"AnthropicClaudeAgent:get_tools: tool instance 'name': {item.name} 'input': {item.input}")
                 tool_info = {'name': item.name, 'input': item.input, 'id': item.id}
-                tool = tool_manager.get_tool(tool_info)
+                tool = self.get_tool_from_response(tool_info)
                 self.logging.info(f"AnthropicClaudeAgent:get_tools: tool instance 'name': {item.name} created")
                 tools.append(tool)
                 self.logging.info(f"AnthropicClaudeAgent:get_tools: compiled the tools and returning")

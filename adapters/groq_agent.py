@@ -1,11 +1,10 @@
 import json
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 import groq
 from groq.types.chat import ChatCompletionMessageToolCall
 from core.abstract_agent import AbstractAgent
 from core.abstract_tool import Tool
 from core.response import Response, ResponseType
-from tools.tool_manager import ToolManager
 from utils.agent_logger import AgentLogger
 
 
@@ -69,9 +68,9 @@ class GroqAgent(AbstractAgent):
             }
         }
         self.formatted_tools.append(formatted_tool)
-        self.tools.append(tool)
+        self.tools[tool.name] = tool
 
-    def run(self, agent_input, is_tool_response) -> Response:
+    def run(self, agent_input, is_tool_response: Optional[bool] = False, conversation_id: Optional[str] = None) -> Response:
         self.logging.info("GroqAgent:run:Running Groq Agent")
         if not self.client:
             raise ValueError("Authentication not set. Please call set_auth() before running the agent.")
@@ -119,14 +118,13 @@ class GroqAgent(AbstractAgent):
 
     def get_tools(self, tool_calls) -> List[Tool]:
         self.logging.info("GroqAgent:get_tools: function called")
-        tool_manager = ToolManager()
         tools = []
 
         for item in tool_calls:
             if isinstance(item, ChatCompletionMessageToolCall):
                 self.logging.info(f"GroqAgent:get_tools: tool instance 'name': {item.function.name} 'input': {item.function.arguments}")
                 tool_info = {'name': item.function.name, 'input': item.function.arguments, 'id': item.id}
-                tool = tool_manager.get_tool(tool_info)
+                tool = self.get_tool_from_response(tool_info)
                 self.logging.info(f"GroqAgent:get_tools: tool instance 'name': {item.function.name} created")
                 tools.append(tool)
                 self.logging.info(f"GroqAgent:get_tools: compiled the tools and returning")

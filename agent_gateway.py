@@ -1,4 +1,4 @@
-from typing import Union, List
+from typing import Union, List, Optional
 from enum import Enum
 from core.abstract_agent import AbstractAgent
 from core.prompt import Prompt
@@ -78,13 +78,17 @@ class AgentGateway:
                     f"AgentGateway:create_agent: Tools {tool.name} auth is not setup, exiting")
                 raise ValueError(f"Invalid auth setup: {tool.name}")
 
-    def run_agent(self, agent_input):
+    def start_conversation(self):
+        self.adapter.start_conversation()
+
+    def run_agent(self, agent_input, conversation_id: Optional[str] = None):
         final_answer = False
         tool_response = False
+        conversation_id = conversation_id
         self.logging.info(f"AgentGateway:run_agent:Running agent for {agent_input}")
         while not final_answer:
 
-            response = self.adapter.run(agent_input, is_tool_response=tool_response)
+            response = self.adapter.run(agent_input, is_tool_response=tool_response, conversation_id=conversation_id)
             self.logging.info(f"AgentGateway:run_agent:Agent execution completed")
             if response.response_type == ResponseType.ANSWER:
                 self.logging.info(f"AgentGateway:run_agent:Final answer from Agent")
@@ -93,6 +97,7 @@ class AgentGateway:
                 return response.content
             elif response.response_type == ResponseType.TOOL_CALL:
                 self.logging.info(f"AgentGateway:run_agent:Agent responds with tool use")
+                conversation_id = response.conversation_id
                 tool_results = []
                 response_tools = response.get_tools()
                 self.logging.info(f"AgentGateway:run_agent: iterating tools")

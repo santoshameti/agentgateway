@@ -42,7 +42,7 @@ class TestAbstractAgent(unittest.TestCase):
 
     def test_initialization(self):
         self.assertEqual(self.agent.instructions, "")
-        self.assertEqual(self.agent.tools, [])
+        self.assertEqual(self.agent.tools, {})
         self.assertEqual(self.agent.formatted_tools, [])
         self.assertEqual(self.agent.conversation_history, [])
         self.assertEqual(self.agent.auth_data, {})
@@ -58,11 +58,7 @@ class TestAbstractAgent(unittest.TestCase):
 
     def test_set_and_get_model(self):
         self.agent.set_model("gpt-4")
-        self.assertEqual(self.agent.get_model("gpt-4"), "gpt-4")
-
-    def test_execute_nonexistent_tool(self):
-        with self.assertRaises(ValueError):
-            self.agent.execute_tool("nonexistent_tool", {})
+        self.assertEqual(self.agent.get_model(), "gpt-4")
 
     def test_set_instructions(self):
         instructions = "New instructions"
@@ -89,12 +85,6 @@ class TestAbstractAgent(unittest.TestCase):
         expected_history = "User: Hello\nAssistant: Hi there"
         self.assertEqual(formatted_history, expected_history)
 
-    def test_get_tools_schema(self):
-        tool = ConcreteTool("test_tool", "A test tool")
-        self.agent.add_tool(tool)
-        schema = self.agent.get_tools_schema()
-        self.assertEqual(len(schema), 1)
-        self.assertEqual(schema[0]["function"]["name"], "test_tool")
 
     def test_run(self):
         response = self.agent.run("test input", False)

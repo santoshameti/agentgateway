@@ -1,12 +1,11 @@
 import json
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 import openai
 from openai.types.chat import ChatCompletionMessageToolCall
 from core.abstract_agent import AbstractAgent
 from core.abstract_tool import Tool
 from core.response import Response, ResponseType
-from tools.tool_manager import ToolManager
 from utils.agent_logger import AgentLogger
 
 class TogetherAIAgent(AbstractAgent):
@@ -69,9 +68,9 @@ class TogetherAIAgent(AbstractAgent):
             }
         }
         self.formatted_tools.append(formatted_tool)
-        self.tools.append(tool)
+        self.tools[tool.name] = tool
 
-    def run(self, agent_input, is_tool_response=False) -> Response:
+    def run(self, agent_input, is_tool_response: Optional[bool] = False, conversation_id: Optional[str] = None) -> Response:
         self.logging.info("TogetherAIAgent:run:Running Together AI Agent")
         if not self.auth_data:
             raise ValueError("Authentication not set. Please call set_auth() before running the agent.")
@@ -119,7 +118,6 @@ class TogetherAIAgent(AbstractAgent):
 
     def get_tools(self, tool_calls) -> List[Tool]:
         self.logging.info("TogetherAIAgent:get_tools: function called")
-        tool_manager = ToolManager()
         tools = []
 
         for item in tool_calls:
@@ -133,7 +131,7 @@ class TogetherAIAgent(AbstractAgent):
                 self.logging.info(f"OpenAIAgent:get_tools: tool instance 'name': {item.function.name} 'input': {tool_input}")
                 tool_info = {'name': item.function.name, 'input': tool_input, 'id': item.id}
 
-                tool = tool_manager.get_tool(tool_info)
+                tool = self.get_tool_from_response(tool_info)
                 self.logging.info(f"OpenAIAgent:get_tools: tool instance 'name': {item.function.name} created")
                 tools.append(tool)
                 self.logging.info(f"OpenAIAgent:get_tools: compiled the tools and returning")

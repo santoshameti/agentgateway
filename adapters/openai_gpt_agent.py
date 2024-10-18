@@ -1,13 +1,12 @@
 from openai import OpenAI, ChatCompletion
 import json, traceback
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 from openai.types.chat import ChatCompletionMessageToolCall
 
 from core.abstract_agent import AbstractAgent
 from core.abstract_tool import Tool
 from core.response import Response, ResponseType
-from tools.tool_manager import ToolManager
 from utils.agent_logger import AgentLogger
 
 
@@ -53,11 +52,10 @@ class OpenAIGPTAgent(AbstractAgent):
             }
         }
         self.formatted_tools.append(formatted_tool)
-        self.tools.append(tool)
+        self.tools[tool.name] = tool
 
     def get_tools(self, response) -> List[Tool]:
         self.logging.info(f"OpenAIAgent:get_tools: function called")
-        tool_manager = ToolManager()
         tools = []
 
         for item in response.tool_calls:
@@ -71,7 +69,7 @@ class OpenAIGPTAgent(AbstractAgent):
                 self.logging.info(f"OpenAIAgent:get_tools: tool instance 'name': {item.function.name} 'input': {tool_input}")
                 tool_info = {'name': item.function.name, 'input': tool_input, 'id': item.id}
 
-                tool = tool_manager.get_tool(tool_info)
+                tool = self.get_tool_from_response(tool_info)
                 self.logging.info(f"OpenAIAgent:get_tools: tool instance 'name': {item.function.name} created")
                 tools.append(tool)
                 self.logging.info(f"OpenAIAgent:get_tools: compiled the tools and returning")
@@ -82,7 +80,7 @@ class OpenAIGPTAgent(AbstractAgent):
     def get_formatted_tool_output(self, tool, tool_output):
         return {"role": "tool", "tool_call_id": tool.instance_id, "content": json.dumps(tool_output)}
 
-    def run(self, agent_input, is_tool_response) -> Response:
+    def run(self, agent_input, is_tool_response: Optional[bool] = False, conversation_id: Optional[str] = None) -> Response:
         self.logging.info("OpenAIAgent:run:Running OpenAI Agent")
         response = Response()
         if not self.client:

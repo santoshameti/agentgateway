@@ -1,12 +1,11 @@
 import json
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 import boto3
 from botocore.exceptions import ClientError
 
 from core.abstract_agent import AbstractAgent
 from core.abstract_tool import Tool
 from core.response import Response, ResponseType
-from tools.tool_manager import ToolManager
 from utils.agent_logger import AgentLogger
 
 class BedrockConverseAgent(AbstractAgent):
@@ -74,9 +73,9 @@ class BedrockConverseAgent(AbstractAgent):
             }
         }
         self.formatted_tools.append(formatted_tool)
-        self.tools.append(tool)
+        self.tools[tool.name] = tool
 
-    def run(self, agent_input, is_tool_response) -> Response:
+    def run(self, agent_input, is_tool_response: Optional[bool] = False, conversation_id: Optional[str] = None) -> Response:
         self.logging.info("BedrockConverseAgent:run:Running Bedrock Converse Agent")
         if not self.client:
             raise ValueError("Authentication not set. Please call set_auth() before running the agent.")
@@ -134,7 +133,6 @@ class BedrockConverseAgent(AbstractAgent):
 
     def get_tools(self, model_response) -> List[Tool]:
         self.logging.info("BedrockConverseAgent:get_tools: function called")
-        tool_manager = ToolManager()
         tools = []
         # The model's response can consist of multiple content blocks
         for content_block in model_response["content"]:
@@ -146,7 +144,7 @@ class BedrockConverseAgent(AbstractAgent):
                     'id': tool_use['toolUseId']
                 }
                 self.logging.info(f"BedrockConverseAgent:get_tools: tool instance 'name': {tool_info['name']} 'input': {tool_info['input']}")
-                tool = tool_manager.get_tool(tool_info)
+                tool = self.get_tool_from_response(tool_info)
                 self.logging.info(f"BedrockConverseAgent:get_tools: tool instance 'name': {tool_info['name']} created")
                 tools.append(tool)
 
