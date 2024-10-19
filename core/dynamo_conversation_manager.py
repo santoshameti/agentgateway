@@ -1,15 +1,25 @@
 import boto3
+import dotenv
 from botocore.exceptions import ClientError
 from typing import List, Dict, Any, Optional
-import uuid
+import uuid, os
 import json
 from core.conversation_manager import ConversationManager
 
 
 class DynamoConversationManager(ConversationManager):
 
-    def __init__(self, table_name: str, region_name: str):
-        self.dynamodb = boto3.resource('dynamodb', region_name=region_name)
+    def __init__(self, table_name: str, region_name: str =""):
+        dotenv.load_dotenv()
+        aws_access_key_id = os.environ.get('AWS_ACCESS_KEY_ID')
+        aws_secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY')
+        region_name = os.environ.get('AWS_REGION', 'us-west-2')  # Default to us-west-2 if not specified
+
+        self.dynamodb = boto3.resource('dynamodb',
+                                       aws_access_key_id=aws_access_key_id,
+                                       aws_secret_access_key=aws_secret_access_key,
+                                       region_name=region_name
+                                       )
         self.table = self.dynamodb.Table(table_name)
 
     def start_conversation(self) -> str:

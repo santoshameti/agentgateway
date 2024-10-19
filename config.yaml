@@ -16,7 +16,7 @@ memory_redis:
 # DynamoDB settings
 memory_dynamodb:
   conversation_manager: dynamodb
-  dynamodb_table: conversations
+  dynamodb_table: agent_conversations
   dynamodb_region: us-west-2
 
 cache:
