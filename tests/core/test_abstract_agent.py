@@ -44,7 +44,7 @@ class TestAbstractAgent(unittest.TestCase):
         self.assertEqual(self.agent.instructions, "")
         self.assertEqual(self.agent.tools, {})
         self.assertEqual(self.agent.formatted_tools, [])
-        self.assertEqual(self.agent.conversation_history, [])
+        self.assertEqual(self.agent.get_conversation_history(), [])
         self.assertEqual(self.agent.auth_data, {})
         self.assertEqual(self.agent.model_config, {"max_tokens": 2000, "temperature": 0.7})
         self.assertEqual(self.agent.model_id, "")
@@ -66,9 +66,10 @@ class TestAbstractAgent(unittest.TestCase):
         self.assertEqual(self.agent.instructions, instructions)
 
     def test_conversation_history(self):
-        self.agent.add_to_conversation_history("user", "Hello")
-        self.agent.add_to_conversation_history("assistant", "Hi there")
-        history = self.agent.get_conversation_history()
+        conversation_id = self.agent.start_conversation()
+        self.agent.add_to_conversation_history({"role":"user", "content":"Hello"}, conversation_id)
+        self.agent.add_to_conversation_history({"role":"assistant", "content":"Hi there"}, conversation_id)
+        history = self.agent.get_conversation_history(conversation_id)
         self.assertEqual(len(history), 2)
         self.assertEqual(history[0]["role"], "user")
         self.assertEqual(history[1]["content"], "Hi there")
@@ -79,9 +80,11 @@ class TestAbstractAgent(unittest.TestCase):
         self.assertEqual(len(self.agent.get_conversation_history()), 0)
 
     def test_get_formatted_conversation_history(self):
-        self.agent.add_to_conversation_history("user", "Hello")
-        self.agent.add_to_conversation_history("assistant", "Hi there")
-        formatted_history = self.agent.get_formatted_conversation_history()
+        conversation_id = self.agent.start_conversation()
+        self.agent.add_to_conversation_history({"role": "user", "content": "Hello"}, conversation_id)
+        self.agent.add_to_conversation_history({"role": "assistant", "content": "Hi there"}, conversation_id)
+
+        formatted_history = self.agent.get_formatted_conversation_history(conversation_id)
         expected_history = "User: Hello\nAssistant: Hi there"
         self.assertEqual(formatted_history, expected_history)
 

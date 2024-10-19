@@ -70,14 +70,20 @@ class AnthropicClaudeAgent(AbstractAgent):
         self.tools[tool.name] = tool
 
     def run(self, agent_input, is_tool_response: Optional[bool] = False, conversation_id: Optional[str] = None) -> Response:
+        if conversation_id is None:
+            if self.current_conversation_id is None:
+                raise ValueError("No conversation id provided. Please start conversation to get started.")
+            else:
+                conversation_id = self.current_conversation_id
+
         self.logging.info("AnthropicClaudeAgent:run:Running Anthropic Claude Agent")
         if not self.client:
             raise ValueError("Authentication not set. Please call set_auth() before running the agent.")
 
-        self.add_to_conversation_history({"role":"user", "content": agent_input})
+        self.add_to_conversation_history({"role":"user", "content": agent_input}, conversation_id)
 
         response = Response()
-        response.set_conversation_id(self.current_conversation_id)
+        response.set_conversation_id(conversation_id)
 
         self.logging.info(f"AnthropicClaudeAgent:run:invoking the selected model {self.model_id}")
         try:
@@ -86,14 +92,14 @@ class AnthropicClaudeAgent(AbstractAgent):
                 system=self.instructions,
                 max_tokens=self.model_config['max_tokens'],
                 temperature=self.model_config['temperature'],
-                messages=self.conversation_history,
+                messages=self.get_conversation_history(conversation_id),
                 tools=self.formatted_tools,
                 tool_choice={"type": "auto"}
             )
 
             self.logging.info(f"AnthropicClaudeAgent:run:model invoke completed")
             assistant_message = self.get_model_response(model_response.content)
-            self.add_to_conversation_history({"role":"assistant", "content":model_response.content})
+            self.add_to_conversation_history({"role":"assistant", "content":model_response.content}, conversation_id)
             if model_response.stop_reason == "tool_use":
                 self.logging.info(f"AnthropicClaudeAgent:run: tool use detected")
                 response.set_response_type(ResponseType.TOOL_CALL)

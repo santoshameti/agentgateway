@@ -75,19 +75,25 @@ class FireworksAIAgent(AbstractAgent):
         if not self.auth_data:
             raise ValueError("Authentication not set. Please call set_auth() before running the agent.")
 
+        if conversation_id is None:
+            if self.current_conversation_id is None:
+                raise ValueError("No conversation id provided. Please start conversation to get started.")
+            else:
+                conversation_id = self.current_conversation_id
+
         response = Response()
-        response.set_conversation_id(self.current_conversation_id)
+        response.set_conversation_id(conversation_id)
 
         try:
             if not is_tool_response:
-                self.add_to_conversation_history({"role":"user", "content":agent_input})
+                self.add_to_conversation_history({"role":"user", "content":agent_input},conversation_id)
             else:
-                self.extend_conversation_history(agent_input)
+                self.extend_conversation_history(agent_input, conversation_id)
 
             messages = [
                 {"role": "system", "content": self.instructions}
             ]
-            messages.extend(self.conversation_history)
+            messages.extend(self.get_conversation_history(conversation_id))
 
             fireworks_response = self.client.chat.completions.create(
                 model=self.model_id,
@@ -98,7 +104,7 @@ class FireworksAIAgent(AbstractAgent):
             )
 
             assistant_message = fireworks_response.choices[0].message
-            self.conversation_history.append(assistant_message)
+            self.add_to_conversation_history(assistant_message, conversation_id)
             finish_reason = fireworks_response.choices[0].finish_reason
 
             if finish_reason == "tool_calls":

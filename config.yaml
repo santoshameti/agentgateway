@@ -1,0 +1,25 @@
+---
+adapters:
+  together_ai_base_url: https://api.together.xyz/inference
+
+# Default settings
+defaults:
+  conversation_manager: in_memory
+  max_tokens: 2000
+  temperature: 0.7
+
+# Redis settings
+memory_redis:
+  conversation_manager: redis
+  redis_url: redis://localhost:6379
+
+# DynamoDB settings
+memory_dynamodb:
+  conversation_manager: dynamodb
+  dynamodb_table: conversations
+  dynamodb_region: us-west-2
+
+cache:
+  ttl: 600 # in seconds
+  debug: True
+...

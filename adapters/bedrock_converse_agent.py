@@ -77,22 +77,29 @@ class BedrockConverseAgent(AbstractAgent):
 
     def run(self, agent_input, is_tool_response: Optional[bool] = False, conversation_id: Optional[str] = None) -> Response:
         self.logging.info("BedrockConverseAgent:run:Running Bedrock Converse Agent")
+
+        if conversation_id is None:
+            if self.current_conversation_id is None:
+                raise ValueError("No conversation id provided. Please start conversation to get started.")
+            else:
+                conversation_id = self.current_conversation_id
+
         if not self.client:
             raise ValueError("Authentication not set. Please call set_auth() before running the agent.")
 
         response = Response()
-        response.set_conversation_id(self.current_conversation_id)
+        response.set_conversation_id(conversation_id)
 
         try:
             if not is_tool_response:
-                self.add_to_conversation_history({"role":"user","content": [{"text": agent_input}]})
+                self.add_to_conversation_history({"role":"user","content": [{"text": agent_input}]}, conversation_id)
             else:
-                self.add_to_conversation_history({"role":"user", "content":agent_input})
+                self.add_to_conversation_history({"role":"user", "content":agent_input}, conversation_id)
 
             body = {
                 "modelId": self.model_id,
                 "system" : [{"text": self.instructions}],
-                "messages": self.conversation_history,
+                "messages": self.get_conversation_history(conversation_id),
                 "toolConfig": {
                     "tools": self.formatted_tools,
                 },
@@ -107,7 +114,7 @@ class BedrockConverseAgent(AbstractAgent):
             bedrock_response = self.client.converse(**body)
 
             assistant_message = bedrock_response['output']['message']['content']
-            self.add_to_conversation_history({"role":"assistant", "content":assistant_message})
+            self.add_to_conversation_history({"role":"assistant", "content":assistant_message}, conversation_id)
 
             if bedrock_response['stopReason'] == "tool_use":
                 self.logging.info("BedrockConverseAgent:run: tool use detected")

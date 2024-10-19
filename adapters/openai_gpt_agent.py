@@ -1,9 +1,7 @@
 from openai import OpenAI, ChatCompletion
 import json, traceback
 from typing import List, Dict, Any, Optional
-
 from openai.types.chat import ChatCompletionMessageToolCall
-
 from core.abstract_agent import AbstractAgent
 from core.abstract_tool import Tool
 from core.response import Response, ResponseType
@@ -82,6 +80,13 @@ class OpenAIGPTAgent(AbstractAgent):
 
     def run(self, agent_input, is_tool_response: Optional[bool] = False, conversation_id: Optional[str] = None) -> Response:
         self.logging.info("OpenAIAgent:run:Running OpenAI Agent")
+
+        if conversation_id is None:
+            if self.current_conversation_id is None:
+                raise ValueError("No conversation id provided. Please start conversation to get started.")
+            else:
+                conversation_id = self.current_conversation_id
+
         response = Response()
         response.set_conversation_id(self.current_conversation_id)
 
@@ -89,14 +94,14 @@ class OpenAIGPTAgent(AbstractAgent):
             raise ValueError("Authentication not set. Please call set_auth() before running the agent.")
 
         if not is_tool_response:
-            self.add_to_conversation_history({"role":"user", "content":agent_input})
+            self.add_to_conversation_history({"role":"user", "content":agent_input}, conversation_id)
         elif is_tool_response:
-            self.extend_conversation_history(agent_input)
+            self.extend_conversation_history(agent_input, conversation_id)
 
         messages = [
             {"role": "system", "content": self.instructions}
         ]
-        messages.extend(self.conversation_history)
+        messages.extend(self.get_conversation_history(conversation_id))
 
         self.logging.info(f"OpenAIAgent:run:invoking the selected model {self.model_id}")
         try:
@@ -112,10 +117,10 @@ class OpenAIGPTAgent(AbstractAgent):
             finish_reason = model_response.choices[0].finish_reason
             if finish_reason != "tool_calls":
                 assistant_message = model_response.choices[0].message.content
-                self.add_to_conversation_history("assistant", assistant_message)
+                self.add_to_conversation_history({"role":"assistant", "content":assistant_message}, conversation_id)
             else:
-                assistant_message = self.generate_assistant_message_for_toolcalls(model_response.choices[0].message)
-                self.add_to_conversation_history(assistant_message)
+                assistant_message = self.generate_assistant_message_for_toolcalls(model_response.choices[0].message )
+                self.add_to_conversation_history(assistant_message, conversation_id)
 
             if finish_reason == "tool_calls":
                 self.logging.info(f"OpenAIAgent:run: function call detected")

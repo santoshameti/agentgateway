@@ -1,9 +1,14 @@
-import json
+import json, os
 from abc import ABC, abstractmethod
 from typing import List, Dict, Any, Optional
 from core.response import Response
 import uuid
 from core.abstract_tool import Tool
+from core.conversation_manager import ConversationManager
+from core.redis_conversation_manager import RedisConversationManager
+from core.dynamo_conversation_manager import DynamoConversationManager
+from utils.config_manager import ConfigManager
+
 
 class AbstractAgent(ABC):
     """
@@ -11,17 +16,34 @@ class AbstractAgent(ABC):
     """
     def __init__(self, model_id: str=""):
 
+        self.config_manager = ConfigManager()
+        self.mem_profile = os.environ.get('AGENT_MEMORY_CONFIG_PROFILE', 'default')
+        self.model_profile = os.environ.get('AGENT_MODEL_CONFIG_PROFILE', 'default')
         self.instructions = ""
         self.tools = {}
         self.formatted_tools = []
-        self.conversation_history = []
         self.auth_data = {}
         self.model_config = {
-            "max_tokens": 2000,
-            "temperature": 0.7
+            "max_tokens": self.config_manager.get_nested(self.model_profile, 'max_tokens', default=2000),
+            "temperature": self.config_manager.get_nested(self.model_profile, 'temperature', default=0.7)
         }
         self.model_id = model_id
-        self.current_conversation_id = None
+        self.current_conversation_id = ""
+        self.conversation_manager = self._initialize_conversation_manager()
+
+    def _initialize_conversation_manager(self) -> ConversationManager:
+        conversation_manager_type = self.config_manager.get_nested(self.mem_profile, 'conversation_manager',
+                                                                   default='in_memory')
+
+        if conversation_manager_type == 'redis':
+            redis_url = self.config_manager.get_nested(self.mem_profile, 'redis_url', default='redis://localhost:6379')
+            return RedisConversationManager(redis_url)
+        elif conversation_manager_type == 'dynamodb':
+            table_name = self.config_manager.get_nested(self.mem_profile, 'dynamodb_table', default='conversations')
+            region_name = self.config_manager.get_nested(self.mem_profile, 'dynamodb_region', default='us-west-2')
+            return DynamoConversationManager(table_name, region_name)
+        else:
+            return ConversationManager()
 
     @abstractmethod
     def run(self, agent_input, is_tool_response: Optional[bool] = False, conversation_id: Optional[str] = None) -> Response:
@@ -115,53 +137,37 @@ class AbstractAgent(ABC):
         self.instructions = instructions
 
     def start_conversation(self) -> str:
-        """
-        Clear the conversation history and start a new conversation.
-        """
-        self.conversation_history = []
-        self.current_conversation_id = str(uuid.uuid4())
-        return self.current_conversation_id
+        conversation_id = self.conversation_manager.start_conversation()
+        self.current_conversation_id = conversation_id
+        return conversation_id
 
-    def get_conversation_history(self, conversation_id: Optional[str] = None ) -> List[Dict[str, Any]]:
-        """
-        Retrieve the conversation history.
-        :return: A list of dictionaries containing the conversation history.
-        """
-        return self.conversation_history
+    def get_conversation_history(self, conversation_id: Optional[str] = None) -> List[Dict[str, Any]]:
+        if conversation_id is None:
+            conversation_id = self.current_conversation_id
+        return self.conversation_manager.get_conversation_history(conversation_id)
 
-    def clear_conversation_history(self):
-        """
-        Clear the conversation history.
-        """
-        self.conversation_history = []
+    def clear_conversation_history(self, conversation_id: Optional[str] = None):
+        if conversation_id is None:
+            conversation_id = self.current_conversation_id
+        self.conversation_manager.clear_conversation_history(conversation_id)
 
     def add_to_conversation_history(self, message: Dict[str, Any], conversation_id: Optional[str] = None):
-        """
-        Add a new message to the conversation history.
-        :param role: The role of the message sender (e.g., "user", "assistant", "system").
-        :param content: The content of the message.
+        if conversation_id is None:
+            conversation_id = self.current_conversation_id
+        self.conversation_manager.add_to_conversation_history(message, conversation_id)
 
-        if role is not None:
-            self.conversation_history.append({"role": role, "content": content})
-        else:
-        """
-        self.conversation_history.append(message)
+    def extend_conversation_history(self, messages: List, conversation_id: Optional[str] = None):
+        if conversation_id is None:
+            conversation_id = self.current_conversation_id
+        self.conversation_manager.extend_conversation_history(messages, conversation_id)
 
-    def extend_conversation_history(self, messages:[List], conversation_id: Optional[str] = None):
-        self.conversation_history.extend(messages)
+    def get_formatted_conversation_history(self, conversation_id: Optional[str] = None) -> str:
+        if conversation_id is None:
+            conversation_id = self.current_conversation_id
+        return self.conversation_manager.get_formatted_conversation_history(conversation_id)
 
     def get_formatted_tool_output(self, tool, tool_output):
         pass
-
-    def get_formatted_conversation_history(self) -> str:
-        """
-        Get the conversation history formatted as a string for model input.
-        :return: A formatted string representation of the conversation history.
-        """
-        formatted_history = ""
-        for message in self.conversation_history:
-            formatted_history += f"{message['role'].capitalize()}: {message['content']}\n"
-        return formatted_history.strip()
 
     def get_tools_schema(self) -> List[Dict[str, Any]]:
         """
