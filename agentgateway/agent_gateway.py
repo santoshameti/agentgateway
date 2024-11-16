@@ -79,7 +79,7 @@ class AgentGateway:
                 raise ValueError(f"Invalid auth setup: {tool.name}")
 
     def start_conversation(self):
-        self.adapter.start_conversation()
+        return self.adapter.start_conversation()
 
     def run_agent(self, agent_input, conversation_id: Optional[str] = None):
         final_answer = False
@@ -87,7 +87,6 @@ class AgentGateway:
         conversation_id = conversation_id
         self.logging.info(f"AgentGateway:run_agent:Running agent for {agent_input}")
         while not final_answer:
-
             response = self.adapter.run(agent_input, is_tool_response=tool_response, conversation_id=conversation_id)
             self.logging.info(f"AgentGateway:run_agent:Agent execution completed")
             if response.response_type == ResponseType.ANSWER:

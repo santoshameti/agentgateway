@@ -4,7 +4,7 @@ print(find_packages())
 
 setup(
     name="agentgateway",  # Your package name on PyPI
-    version="1.1.0",  # Update as needed
+    version="1.1.1",  # Update as needed
     description="A centralized framework to use a model of your choice for your agentic usecases.",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
@@ -21,4 +21,7 @@ setup(
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.6",  # Update as needed
+    package_data={
+        '': ['config.yaml'],  # Include config.yaml in the root of the package
+    },
 )

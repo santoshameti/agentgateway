@@ -1,5 +1,6 @@
 include README.md
 include LICENSE
+include config.yaml
 include requirements.txt
 recursive-include adapters *
 recursive-include core *
