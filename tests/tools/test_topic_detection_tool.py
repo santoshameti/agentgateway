@@ -1,7 +1,7 @@
 import json
 import unittest
 from unittest.mock import patch, MagicMock
-from tools.topic_detection_tool import TopicDetectionTool
+from agentgateway.tools.topic_detection_tool import TopicDetectionTool
 
 
 class TestTopicDetectionTool(unittest.TestCase):
@@ -9,7 +9,7 @@ class TestTopicDetectionTool(unittest.TestCase):
         self.tool = TopicDetectionTool()
         self.tool.set_auth(api_key="dummy_key")
 
-    @patch('tools.topic_detection_tool.Anthropic')
+    @patch('agentgateway.tools.topic_detection_tool.Anthropic')
     def test_topic_detection(self, mock_anthropic):
         # Mock the Anthropic client and its methods
         mock_client = MagicMock()

@@ -1,16 +1,16 @@
 from typing import Union, List, Optional
 from enum import Enum
-from core.abstract_agent import AbstractAgent
-from core.prompt import Prompt
-from core.abstract_tool import Tool
-from core.response import Response, ResponseType
-from utils.agent_logger import AgentLogger
-from adapters.anthropic_claude_agent import AnthropicClaudeAgent
-from adapters.openai_gpt_agent import OpenAIGPTAgent
-from adapters.bedrock_converse_agent import BedrockConverseAgent
-from adapters.groq_agent import GroqAgent
-from adapters.together_ai_agent import TogetherAIAgent
-from adapters.fireworks_ai_agent import FireworksAIAgent
+from agentgateway.core.abstract_agent import AbstractAgent
+from agentgateway.core.prompt import Prompt
+from agentgateway.core.abstract_tool import Tool
+from agentgateway.core.response import Response, ResponseType
+from agentgateway.utils.agent_logger import AgentLogger
+from agentgateway.adapters.anthropic_claude_agent import AnthropicClaudeAgent
+from agentgateway.adapters.openai_gpt_agent import OpenAIGPTAgent
+from agentgateway.adapters.bedrock_converse_agent import BedrockConverseAgent
+from agentgateway.adapters.groq_agent import GroqAgent
+from agentgateway.adapters.together_ai_agent import TogetherAIAgent
+from agentgateway.adapters.fireworks_ai_agent import FireworksAIAgent
 
 class AgentType(Enum):
     BEDROCK = "bedrock"

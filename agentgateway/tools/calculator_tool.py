@@ -1,5 +1,5 @@
 from typing import Dict, Any
-from core.abstract_tool import Tool
+from agentgateway.core.abstract_tool import Tool
 
 class CalculatorTool(Tool):
     def __init__(self):

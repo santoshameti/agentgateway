@@ -1,9 +1,9 @@
 import pytest
-from tools.tool_manager import ToolManager
-from tools.askuser_tool import AskUserTool
-from tools.weather_tool import WeatherTool
-from tools.calculator_tool import CalculatorTool
-from tools.translate_tool import TranslationTool
+from agentgateway.tools.tool_manager import ToolManager
+from agentgateway.tools.askuser_tool import AskUserTool
+from agentgateway.tools.weather_tool import WeatherTool
+from agentgateway.tools.calculator_tool import CalculatorTool
+from agentgateway.tools.translate_tool import TranslationTool
 
 
 def test_tool_manager_get_tool():

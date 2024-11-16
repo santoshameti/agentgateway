@@ -1,15 +1,15 @@
 import json
 from typing import Dict, Any
-from core.abstract_tool import Tool
-from tools.askuser_tool import AskUserTool
-from tools.weather_tool import WeatherTool
-from tools.calculator_tool import CalculatorTool
-from tools.translate_tool import TranslationTool
-from tools.web_search_tool import WebSearchTool
-from utils.agent_logger import AgentLogger
-from tools.sentiment_analysis_tool import SentimentAnalysisTool
-from tools.topic_detection_tool import TopicDetectionTool
-from tools.text_summarization_tool import TextSummarizationTool
+from agentgateway.core.abstract_tool import Tool
+from agentgateway.tools.askuser_tool import AskUserTool
+from agentgateway.tools.weather_tool import WeatherTool
+from agentgateway.tools.calculator_tool import CalculatorTool
+from agentgateway.tools.translate_tool import TranslationTool
+from agentgateway.tools.web_search_tool import WebSearchTool
+from agentgateway.utils.agent_logger import AgentLogger
+from agentgateway.tools.sentiment_analysis_tool import SentimentAnalysisTool
+from agentgateway.tools.topic_detection_tool import TopicDetectionTool
+from agentgateway.tools.text_summarization_tool import TextSummarizationTool
 
 class ToolManager:
     def __init__(self):

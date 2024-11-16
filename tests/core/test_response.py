@@ -1,5 +1,5 @@
 import unittest
-from core.response import Response, ResponseType
+from agentgateway.core.response import Response, ResponseType
 
 class TestResponse(unittest.TestCase):
     def setUp(self):

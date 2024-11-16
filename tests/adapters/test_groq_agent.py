@@ -1,9 +1,9 @@
 import unittest
 from unittest.mock import patch, MagicMock
 from groq.types.chat import ChatCompletionMessage, ChatCompletionMessageToolCall
-from core.response import Response, ResponseType
-from core.abstract_tool import Tool
-from adapters.groq_agent import GroqAgent
+from agentgateway.core.response import Response, ResponseType
+from agentgateway.core.abstract_tool import Tool
+from agentgateway.adapters.groq_agent import GroqAgent
 
 class TestGroqAgent(unittest.TestCase):
 

@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from adapters.openai_gpt_agent import  OpenAIGPTAgent
-from core.response import Response, ResponseType
-from core.abstract_tool import Tool
+from agentgateway.adapters.openai_gpt_agent import  OpenAIGPTAgent
+from agentgateway.core.response import Response, ResponseType
+from agentgateway.core.abstract_tool import Tool
 from openai.types.chat import ChatCompletionMessage, ChatCompletionMessageToolCall
 from openai.types.chat.chat_completion_message_tool_call import Function
 

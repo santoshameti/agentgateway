@@ -1,8 +1,8 @@
 import unittest
 from typing import Dict, Any
-from core.abstract_agent import AbstractAgent
-from core.response import Response, ResponseType
-from core.abstract_tool import Tool
+from agentgateway.core.abstract_agent import AbstractAgent
+from agentgateway.core.response import Response, ResponseType
+from agentgateway.core.abstract_tool import Tool
 
 class ConcreteTool(Tool):
     def __init__(self, name: str, description: str):

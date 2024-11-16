@@ -1,6 +1,6 @@
 import requests
 from typing import Dict, Any
-from core.abstract_tool import Tool
+from agentgateway.core.abstract_tool import Tool
 from datetime import datetime
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderTimedOut, GeocoderUnavailable

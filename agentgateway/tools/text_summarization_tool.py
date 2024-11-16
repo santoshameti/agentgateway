@@ -1,5 +1,5 @@
 from typing import Dict, Any
-from core.abstract_tool import Tool
+from agentgateway.core.abstract_tool import Tool
 from anthropic import Anthropic
 
 

@@ -1,5 +1,5 @@
 import pytest
-from tools.askuser_tool import AskUserTool
+from agentgateway.tools.askuser_tool import AskUserTool
 from unittest.mock import patch
 
 

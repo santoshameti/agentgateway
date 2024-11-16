@@ -4,3 +4,6 @@ tests/.DS_Store
 .env
 .venv/*
 scratchpad
+agentgateway.egg-info/
+build/
+dist/

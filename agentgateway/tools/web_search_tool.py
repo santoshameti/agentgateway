@@ -1,6 +1,6 @@
 import json
 from typing import Dict, Any
-from core.abstract_tool import Tool
+from agentgateway.core.abstract_tool import Tool
 import requests
 from bs4 import BeautifulSoup
 

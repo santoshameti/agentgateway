@@ -3,10 +3,10 @@ from typing import List, Dict, Any, Optional
 import boto3
 from botocore.exceptions import ClientError
 
-from core.abstract_agent import AbstractAgent
-from core.abstract_tool import Tool
-from core.response import Response, ResponseType
-from utils.agent_logger import AgentLogger
+from agentgateway.core.abstract_agent import AbstractAgent
+from agentgateway.core.abstract_tool import Tool
+from agentgateway.core.response import Response, ResponseType
+from agentgateway.utils.agent_logger import AgentLogger
 
 class BedrockConverseAgent(AbstractAgent):
     def __init__(self, model_id: str):

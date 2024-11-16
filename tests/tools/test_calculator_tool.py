@@ -1,5 +1,5 @@
 import pytest
-from tools.calculator_tool import CalculatorTool
+from agentgateway.tools.calculator_tool import CalculatorTool
 
 def test_calculator_tool_initialization():
     tool = CalculatorTool()

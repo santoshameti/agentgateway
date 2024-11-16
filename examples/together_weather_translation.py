@@ -1,10 +1,10 @@
 import os
 from dotenv import load_dotenv
-from agent_gateway import AgentGateway, AgentType
-from core.prompt import Prompt
-from tools.weather_tool import WeatherTool
-from tools.translate_tool import TranslationTool
-from tools.askuser_tool import AskUserTool
+from agentgateway.agent_gateway import AgentGateway, AgentType
+from agentgateway.core.prompt import Prompt
+from agentgateway.tools.weather_tool import WeatherTool
+from agentgateway.tools.translate_tool import TranslationTool
+from agentgateway.tools.askuser_tool import AskUserTool
 
 # Load environment variables
 load_dotenv()

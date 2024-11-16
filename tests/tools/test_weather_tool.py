@@ -1,5 +1,5 @@
 import pytest
-from tools.weather_tool import WeatherTool
+from agentgateway.tools.weather_tool import WeatherTool
 from unittest.mock import patch, MagicMock
 
 
@@ -14,8 +14,8 @@ def test_weather_tool_is_auth_setup():
     assert tool.is_auth_setup() == True
 
 
-@patch('tools.weather_tool.requests.get')
-@patch('tools.weather_tool.WeatherTool.get_coordinates')
+@patch('agentgateway.tools.weather_tool.requests.get')
+@patch('agentgateway.tools.weather_tool.WeatherTool.get_coordinates')
 def test_weather_tool_execute(mock_get_coordinates, mock_requests_get):
     tool = WeatherTool()
     tool.set_parameter("location", "London,UK")

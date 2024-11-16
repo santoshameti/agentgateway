@@ -1,13 +1,13 @@
 import json
 import unittest
-from tools.web_search_tool import WebSearchTool
+from agentgateway.tools.web_search_tool import WebSearchTool
 from unittest.mock import patch, MagicMock
 
 class TestWebSearchTool(unittest.TestCase):
     def setUp(self):
         self.tool = WebSearchTool()
 
-    @patch('tools.web_search_tool.requests.get')
+    @patch('agentgateway.tools.web_search_tool.requests.get')
     def test_web_search(self, mock_get):
         # Mock the response
         mock_response = MagicMock()

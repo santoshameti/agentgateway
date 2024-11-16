@@ -1,13 +1,13 @@
 import json, os
 from abc import ABC, abstractmethod
 from typing import List, Dict, Any, Optional
-from core.response import Response
+from agentgateway.core.response import Response
 import uuid
-from core.abstract_tool import Tool
-from core.conversation_manager import ConversationManager
-from core.redis_conversation_manager import RedisConversationManager
-from core.dynamo_conversation_manager import DynamoConversationManager
-from utils.config_manager import ConfigManager
+from agentgateway.core.abstract_tool import Tool
+from agentgateway.core.conversation_manager import ConversationManager
+from agentgateway.core.redis_conversation_manager import RedisConversationManager
+from agentgateway.core.dynamo_conversation_manager import DynamoConversationManager
+from agentgateway.utils.config_manager import ConfigManager
 
 
 class AbstractAgent(ABC):

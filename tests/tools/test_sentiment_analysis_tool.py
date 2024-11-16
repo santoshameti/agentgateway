@@ -1,14 +1,14 @@
 import json
 import unittest
 from unittest.mock import patch, MagicMock
-from tools.sentiment_analysis_tool import SentimentAnalysisTool
+from agentgateway.tools.sentiment_analysis_tool import SentimentAnalysisTool
 
 class TestSentimentAnalysisTool(unittest.TestCase):
     def setUp(self):
         self.tool = SentimentAnalysisTool()
         self.tool.set_auth(api_key="dummy_key")
 
-    @patch('tools.sentiment_analysis_tool.Anthropic')
+    @patch('agentgateway.tools.sentiment_analysis_tool.Anthropic')
     def test_sentiment_analysis(self, mock_anthropic):
         # Mock the Anthropic client and its methods
         mock_client = MagicMock()

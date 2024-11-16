@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from adapters.anthropic_claude_agent import AnthropicClaudeAgent
-from core.response import Response, ResponseType
-from core.abstract_tool import Tool
+from agentgateway.adapters.anthropic_claude_agent import AnthropicClaudeAgent
+from agentgateway.core.response import Response, ResponseType
+from agentgateway.core.abstract_tool import Tool
 
 class TestAnthropicClaudeAgent(unittest.TestCase):
 

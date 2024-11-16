@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from adapters.together_ai_agent import TogetherAIAgent
-from core.response import Response, ResponseType
-from core.abstract_tool import Tool
+from agentgateway.adapters.together_ai_agent import TogetherAIAgent
+from agentgateway.core.response import Response, ResponseType
+from agentgateway.core.abstract_tool import Tool
 from openai.types.chat import ChatCompletionMessage, ChatCompletionMessageToolCall
 from openai.types.chat.chat_completion_message_tool_call import Function
 
@@ -83,7 +83,7 @@ class TestTogetherAIAgent(unittest.TestCase):
         mock_response.choices[0].finish_reason = "tool_calls"
         mock_openai.return_value.chat.completions.create.return_value = mock_response
 
-        with patch('tools.tool_manager.ToolManager.get_tool') as mock_get_tool:
+        with patch('agentgateway.tools.tool_manager.ToolManager.get_tool') as mock_get_tool:
             mock_tool = MagicMock(spec=Tool)
             mock_get_tool.return_value = mock_tool
             response = self.agent.run("Test input")

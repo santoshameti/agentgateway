@@ -1,13 +1,13 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from tools.text_summarization_tool import TextSummarizationTool
+from agentgateway.tools.text_summarization_tool import TextSummarizationTool
 
 class TestTextSummarizationTool(unittest.TestCase):
     def setUp(self):
         self.tool = TextSummarizationTool()
         self.tool.set_auth(api_key="dummy_key")
 
-    @patch('tools.text_summarization_tool.Anthropic')
+    @patch('agentgateway.tools.text_summarization_tool.Anthropic')
     def test_summarization(self, mock_anthropic):
         # Mock the Anthropic client and its methods
         mock_client = MagicMock()

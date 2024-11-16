@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from adapters.bedrock_converse_agent import BedrockConverseAgent
-from core.response import Response, ResponseType
-from core.abstract_tool import Tool
+from agentgateway.adapters.bedrock_converse_agent import BedrockConverseAgent
+from agentgateway.core.response import Response, ResponseType
+from agentgateway.core.abstract_tool import Tool
 import json
 
 class TestBedrockConverseAgent(unittest.TestCase):

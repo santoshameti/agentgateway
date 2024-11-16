@@ -1,10 +1,10 @@
 import unittest
 from typing import Dict, Any
 from unittest.mock import patch, MagicMock
-from core.abstract_agent import AbstractAgent
-from core.conversation_manager import ConversationManager
-from core.redis_conversation_manager import RedisConversationManager
-from core.dynamo_conversation_manager import DynamoConversationManager
+from agentgateway.core.abstract_agent import AbstractAgent
+from agentgateway.core.conversation_manager import ConversationManager
+from agentgateway.core.redis_conversation_manager import RedisConversationManager
+from agentgateway.core.dynamo_conversation_manager import DynamoConversationManager
 import os
 
 
@@ -25,7 +25,7 @@ class MockAgent(AbstractAgent):
         pass
 
 class TestAbstractAgentConversationManager(unittest.TestCase):
-    @patch('core.abstract_agent.ConfigManager')
+    @patch('agentgateway.core.abstract_agent.ConfigManager')
     def setUp(self, mock_config_manager):
         self.mock_config = mock_config_manager.return_value
         self.mock_config.get_nested.side_effect = lambda *args, **kwargs: {
@@ -66,7 +66,7 @@ class TestAbstractAgentConversationManager(unittest.TestCase):
         self.assertIsInstance(agent.conversation_manager, ConversationManager)  # Should fall back to default
 
 class TestConversationManager(unittest.TestCase):
-    @patch('core.abstract_agent.ConfigManager')
+    @patch('agentgateway.core.abstract_agent.ConfigManager')
     def setUp(self, mock_config_manager):
         self.mock_config = mock_config_manager.return_value
         self.mock_config.get_nested.side_effect = lambda *args, **kwargs: {

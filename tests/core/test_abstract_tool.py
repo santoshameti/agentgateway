@@ -1,7 +1,7 @@
 import unittest
 from typing import Dict, Any
 from abc import ABC, abstractmethod
-from core.abstract_tool import Tool
+from agentgateway.core.abstract_tool import Tool
 
 class ConcreteTool(Tool):
     def __init__(self, name: str, description: str):

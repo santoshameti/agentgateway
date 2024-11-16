@@ -1,5 +1,5 @@
 import pytest
-from tools.translate_tool import TranslationTool
+from agentgateway.tools.translate_tool import TranslationTool
 from unittest.mock import patch, MagicMock
 
 
@@ -16,7 +16,7 @@ def test_translation_tool_is_auth_setup():
     assert tool.is_auth_setup() == True
 
 
-@patch('tools.translate_tool.Anthropic')
+@patch('agentgateway.tools.translate_tool.Anthropic')
 def test_translation_tool_execute(mock_anthropic_class):
     # Setup the mock
     mock_anthropic_instance = MagicMock()
@@ -56,7 +56,7 @@ def test_translation_tool_parameters_schema():
     assert all(param in schema["required"] for param in ["text", "source_lang", "target_lang"])
 
 
-@patch('tools.translate_tool.Anthropic')
+@patch('agentgateway.tools.translate_tool.Anthropic')
 def test_translation_tool_execute_api_error(mock_anthropic_class):
     # Setup the mock to raise an exception
     mock_anthropic_instance = MagicMock()

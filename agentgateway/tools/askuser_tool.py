@@ -1,6 +1,6 @@
 import requests
 from typing import Dict, Any
-from core.abstract_tool import Tool
+from agentgateway.core.abstract_tool import Tool
 
 class AskUserTool(Tool):
     def __init__(self):

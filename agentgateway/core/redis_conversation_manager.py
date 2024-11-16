@@ -2,7 +2,7 @@ import redis
 import json
 from typing import List, Dict, Any, Optional
 import uuid
-from core.conversation_manager import ConversationManager
+from agentgateway.core.conversation_manager import ConversationManager
 
 
 class RedisConversationManager(ConversationManager):

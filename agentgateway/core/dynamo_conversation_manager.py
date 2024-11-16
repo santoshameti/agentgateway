@@ -4,7 +4,7 @@ from botocore.exceptions import ClientError
 from typing import List, Dict, Any, Optional
 import uuid, os
 import json
-from core.conversation_manager import ConversationManager
+from agentgateway.core.conversation_manager import ConversationManager
 
 
 class DynamoConversationManager(ConversationManager):

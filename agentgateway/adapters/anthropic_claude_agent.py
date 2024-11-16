@@ -1,11 +1,11 @@
 import anthropic
 import json
 from typing import List, Dict, Any, Type, Optional
-from core.abstract_agent import AbstractAgent
-from core.abstract_tool import Tool
-from core.response import Response, ResponseType
+from agentgateway.core.abstract_agent import AbstractAgent
+from agentgateway.core.abstract_tool import Tool
+from agentgateway.core.response import Response, ResponseType
 from anthropic.types import ToolUseBlock, TextBlock
-from utils.agent_logger import AgentLogger
+from agentgateway.utils.agent_logger import AgentLogger
 
 
 class AnthropicClaudeAgent(AbstractAgent):

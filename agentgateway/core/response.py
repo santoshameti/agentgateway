@@ -1,6 +1,5 @@
 from enum import Enum
 from typing import Optional, Any
-from core.abstract_tool import Tool
 
 class ResponseType(Enum):
     ANSWER = "answer"
