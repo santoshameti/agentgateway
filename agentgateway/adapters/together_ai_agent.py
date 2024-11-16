@@ -95,13 +95,20 @@ class TogetherAIAgent(AbstractAgent):
             ]
             messages.extend(self.get_conversation_history(conversation_id))
 
-            together_response = self.client.chat.completions.create(
-                model=self.model_id,
-                messages=messages,
-                tools=self.formatted_tools,
-                tool_choice="auto",
-                **self.model_config
-            )
+            if len(self.formatted_tools) > 0:
+                together_response = self.client.chat.completions.create(
+                    model=self.model_id,
+                    messages=messages,
+                    tools=self.formatted_tools,
+                    tool_choice="auto",
+                    **self.model_config
+                )
+            else:
+                together_response = self.client.chat.completions.create(
+                    model=self.model_id,
+                    messages=messages,
+                    **self.model_config
+                )
 
             response_data = together_response
             assistant_message = response_data.choices[0].message

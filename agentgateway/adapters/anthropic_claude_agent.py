@@ -87,15 +87,24 @@ class AnthropicClaudeAgent(AbstractAgent):
 
         self.logging.info(f"AnthropicClaudeAgent:run:invoking the selected model {self.model_id}")
         try:
-            model_response = self.client.messages.create(
-                model=self.model_id,
-                system=self.instructions,
-                max_tokens=self.model_config['max_tokens'],
-                temperature=self.model_config['temperature'],
-                messages=self.get_conversation_history(conversation_id),
-                tools=self.formatted_tools,
-                tool_choice={"type": "auto"}
-            )
+            if len(self.formatted_tools) > 0:
+                model_response = self.client.messages.create(
+                    model=self.model_id,
+                    system=self.instructions,
+                    max_tokens=self.model_config['max_tokens'],
+                    temperature=self.model_config['temperature'],
+                    messages=self.get_conversation_history(conversation_id),
+                    tools=self.formatted_tools,
+                    tool_choice={"type": "auto"}
+                )
+            else:
+                model_response = self.client.messages.create(
+                    model=self.model_id,
+                    system=self.instructions,
+                    max_tokens=self.model_config['max_tokens'],
+                    temperature=self.model_config['temperature'],
+                    messages=self.get_conversation_history(conversation_id)
+                )
 
             self.logging.info(f"AnthropicClaudeAgent:run:model invoke completed")
             assistant_message = self.get_model_response(model_response.content)

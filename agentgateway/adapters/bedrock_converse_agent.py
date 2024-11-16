@@ -96,20 +96,33 @@ class BedrockConverseAgent(AbstractAgent):
             else:
                 self.add_to_conversation_history({"role":"user", "content":agent_input}, conversation_id)
 
-            body = {
-                "modelId": self.model_id,
-                "system" : [{"text": self.instructions}],
-                "messages": self.get_conversation_history(conversation_id),
-                "toolConfig": {
-                    "tools": self.formatted_tools,
-                },
-                "inferenceConfig": {
-                    "maxTokens": self.model_config.get('max_tokens', 2000),
-                    "temperature": self.model_config.get('temperature', 0.7),
-                    "topP": self.model_config.get('top_p', 1),
-                    "stopSequences": self.model_config.get('stop_sequences', [])
+            if len(self.formatted_tools) > 0:
+                body = {
+                    "modelId": self.model_id,
+                    "system" : [{"text": self.instructions}],
+                    "messages": self.get_conversation_history(conversation_id),
+                    "toolConfig": {
+                        "tools": self.formatted_tools,
+                    },
+                    "inferenceConfig": {
+                        "maxTokens": self.model_config.get('max_tokens', 2000),
+                        "temperature": self.model_config.get('temperature', 0.7),
+                        "topP": self.model_config.get('top_p', 1),
+                        "stopSequences": self.model_config.get('stop_sequences', [])
+                    }
                 }
-            }
+            else:
+                body = {
+                    "modelId": self.model_id,
+                    "system": [{"text": self.instructions}],
+                    "messages": self.get_conversation_history(conversation_id),
+                    "inferenceConfig": {
+                        "maxTokens": self.model_config.get('max_tokens', 2000),
+                        "temperature": self.model_config.get('temperature', 0.7),
+                        "topP": self.model_config.get('top_p', 1),
+                        "stopSequences": self.model_config.get('stop_sequences', [])
+                    }
+                }
 
             bedrock_response = self.client.converse(**body)
 

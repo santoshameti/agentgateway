@@ -95,13 +95,20 @@ class GroqAgent(AbstractAgent):
             ]
             messages.extend(self.get_conversation_history(conversation_id))
 
-            groq_response = self.client.chat.completions.create(
-                model=self.model_id,
-                messages=messages,
-                tools=self.formatted_tools,
-                tool_choice="auto",
-                **self.model_config
-            )
+            if len(self.formatted_tools) > 0:
+                groq_response = self.client.chat.completions.create(
+                    model=self.model_id,
+                    messages=messages,
+                    tools=self.formatted_tools,
+                    tool_choice="auto",
+                    **self.model_config
+                )
+            else:
+                groq_response = self.client.chat.completions.create(
+                    model=self.model_id,
+                    messages=messages,
+                    **self.model_config
+                )
 
             finish_reason = groq_response.choices[0].finish_reason
             assistant_message = groq_response.choices[0].message

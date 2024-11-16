@@ -88,7 +88,7 @@ class OpenAIGPTAgent(AbstractAgent):
                 conversation_id = self.current_conversation_id
 
         response = Response()
-        response.set_conversation_id(self.current_conversation_id)
+        response.set_conversation_id(conversation_id)
 
         if not self.client:
             raise ValueError("Authentication not set. Please call set_auth() before running the agent.")
@@ -105,13 +105,21 @@ class OpenAIGPTAgent(AbstractAgent):
 
         self.logging.info(f"OpenAIAgent:run:invoking the selected model {self.model_id}")
         try:
-            model_response = self.client.chat.completions.create(
-                model=self.model_id,
-                messages=messages,
-                max_tokens=self.model_config['max_tokens'],
-                temperature=self.model_config['temperature'],
-                tools=self.formatted_tools
-            )
+            if len(self.tools) > 0:
+                model_response = self.client.chat.completions.create(
+                    model=self.model_id,
+                    messages=messages,
+                    max_tokens=self.model_config['max_tokens'],
+                    temperature=self.model_config['temperature'],
+                    tools=self.formatted_tools
+                )
+            else:
+                model_response = self.client.chat.completions.create(
+                    model=self.model_id,
+                    messages=messages,
+                    max_tokens=self.model_config['max_tokens'],
+                    temperature=self.model_config['temperature']
+                )
 
             self.logging.info(f"OpenAIAgent:run:model invoke completed")
             finish_reason = model_response.choices[0].finish_reason

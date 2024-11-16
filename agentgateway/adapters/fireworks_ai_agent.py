@@ -95,13 +95,20 @@ class FireworksAIAgent(AbstractAgent):
             ]
             messages.extend(self.get_conversation_history(conversation_id))
 
-            fireworks_response = self.client.chat.completions.create(
-                model=self.model_id,
-                messages=messages,
-                tools=self.formatted_tools,
-                tool_choice="auto",
-                **self.model_config
-            )
+            if len(self.formatted_tools) > 0:
+                fireworks_response = self.client.chat.completions.create(
+                    model=self.model_id,
+                    messages=messages,
+                    tools=self.formatted_tools,
+                    tool_choice="auto",
+                    **self.model_config
+                )
+            else:
+                fireworks_response = self.client.chat.completions.create(
+                    model=self.model_id,
+                    messages=messages,
+                    **self.model_config
+                )
 
             assistant_message = fireworks_response.choices[0].message
             self.add_to_conversation_history(assistant_message, conversation_id)
