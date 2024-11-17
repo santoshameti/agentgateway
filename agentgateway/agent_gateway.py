@@ -11,6 +11,8 @@ from agentgateway.adapters.bedrock_converse_agent import BedrockConverseAgent
 from agentgateway.adapters.groq_agent import GroqAgent
 from agentgateway.adapters.together_ai_agent import TogetherAIAgent
 from agentgateway.adapters.fireworks_ai_agent import FireworksAIAgent
+from agentgateway.core.conversation_manager import ConversationManager
+
 
 class AgentType(Enum):
     BEDROCK = "bedrock"
@@ -64,12 +66,30 @@ class AgentGateway:
         else:
             raise UnsupportedAgentException(agent_type.value)
 
-    def prepare_agent(self, prompt: Prompt, tools: list[Tool] = []):
+    def prepare_agent(self, prompt: Prompt, tools: list[Tool] = [],
+                      conversation_manager: Optional[ConversationManager] = None):
+        """
+        Prepare the agent with prompt, tools, and optional conversation manager.
+
+        Args:
+            prompt (Prompt): The prompt to set for the agent
+            tools (list[Tool], optional): List of tools to add to the agent. Defaults to [].
+            conversation_manager (Optional[ConversationManager], optional): Custom conversation manager. Defaults to None.
+
+        Raises:
+            ValueError: If tool authentication is not properly set up
+            TypeError: If provided conversation manager is not a valid ConversationManager instance
+        """
         self.logging.info(f"AgentGateway:create_agent: Preparing the requested agent")
         self.adapter.set_instructions(prompt.content)
 
+        # Set custom conversation manager if provided
+        if conversation_manager is not None:
+            self.adapter.set_conversation_manager(conversation_manager)
+
         for tool in tools:
-            self.logging.info(f"AgentGateway:create_agent: Iterating the tools and validating auth {tool.is_auth_setup()}")
+            self.logging.info(
+                f"AgentGateway:create_agent: Iterating the tools and validating auth {tool.is_auth_setup()}")
             if tool.is_auth_setup():
                 self.adapter.add_tool(tool)
                 self.tools[tool.name] = tool

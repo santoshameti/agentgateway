@@ -45,6 +45,23 @@ class AbstractAgent(ABC):
         else:
             return ConversationManager()
 
+    def set_conversation_manager(self, manager: ConversationManager) -> None:
+        """
+        Set a custom conversation manager implementation.
+
+        Args:
+            manager: An instance of a class that extends ConversationManager
+
+        Raises:
+            TypeError: If the provided manager is not an instance of ConversationManager
+        """
+        if not isinstance(manager, ConversationManager):
+            raise TypeError(
+                f"Manager must be an instance of ConversationManager. Got {type(manager).__name__}"
+            )
+
+        self.conversation_manager = manager
+
     @abstractmethod
     def run(self, agent_input, is_tool_response: Optional[bool] = False, conversation_id: Optional[str] = None) -> Response:
         """
