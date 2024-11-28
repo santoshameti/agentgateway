@@ -14,6 +14,7 @@ class BedrockConverseAgent(AbstractAgent):
         self.client = None
         self.formatted_tools = []
         self.logging = AgentLogger("BedrockConverseAgent")
+        self.response = None
 
     def set_auth(self, **kwargs):
         """
@@ -78,6 +79,12 @@ class BedrockConverseAgent(AbstractAgent):
     def run(self, agent_input, is_tool_response: Optional[bool] = False, conversation_id: Optional[str] = None) -> Response:
         self.logging.info("BedrockConverseAgent:run:Running Bedrock Converse Agent")
 
+        # if response object is not set, create a new one
+        if self.response is None:
+            self.response = Response()
+
+        response = self.response
+
         if conversation_id is None:
             if self.current_conversation_id is None:
                 raise ValueError("No conversation id provided. Please start conversation to get started.")
@@ -86,9 +93,6 @@ class BedrockConverseAgent(AbstractAgent):
 
         if not self.client:
             raise ValueError("Authentication not set. Please call set_auth() before running the agent.")
-
-        response = Response()
-        response.set_conversation_id(conversation_id)
 
         try:
             if not is_tool_response:
@@ -125,6 +129,12 @@ class BedrockConverseAgent(AbstractAgent):
                 }
 
             bedrock_response = self.client.converse(**body)
+            usage = bedrock_response.get('usage', {})
+            input_tokens = usage.get('inputTokens', 0)
+            output_tokens = usage.get('outputTokens', 0)
+
+            response.set_conversation_id(conversation_id)
+            response.update_usage(input_tokens, output_tokens)
 
             assistant_message = bedrock_response['output']['message']['content']
             self.add_to_conversation_history({"role":"assistant", "content":assistant_message}, conversation_id)

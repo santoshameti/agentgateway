@@ -14,6 +14,7 @@ class OpenAIGPTAgent(AbstractAgent):
         self.client = None
         self.formatted_tools = []
         self.logging = AgentLogger("Agent")
+        self.response = None
 
     def set_auth(self, **kwargs):
         if 'api_key' not in kwargs:
@@ -81,14 +82,17 @@ class OpenAIGPTAgent(AbstractAgent):
     def run(self, agent_input, is_tool_response: Optional[bool] = False, conversation_id: Optional[str] = None) -> Response:
         self.logging.info("OpenAIAgent:run:Running OpenAI Agent")
 
+        # if response object is not set, create a new one
+        if self.response is None:
+            self.response = Response()
+
+        response = self.response
+
         if conversation_id is None:
             if self.current_conversation_id is None:
                 raise ValueError("No conversation id provided. Please start conversation to get started.")
             else:
                 conversation_id = self.current_conversation_id
-
-        response = Response()
-        response.set_conversation_id(conversation_id)
 
         if not self.client:
             raise ValueError("Authentication not set. Please call set_auth() before running the agent.")
@@ -120,6 +124,10 @@ class OpenAIGPTAgent(AbstractAgent):
                     max_tokens=self.model_config['max_tokens'],
                     temperature=self.model_config['temperature']
                 )
+
+            response.set_conversation_id(conversation_id)
+            response.update_usage(model_response.usage.prompt_tokens,
+                                  model_response.usage.completion_tokens)
 
             self.logging.info(f"OpenAIAgent:run:model invoke completed")
             finish_reason = model_response.choices[0].finish_reason

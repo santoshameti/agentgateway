@@ -14,6 +14,7 @@ class FireworksAIAgent(AbstractAgent):
         self.api_url = "https://api.fireworks.ai/inference/v1"
         self.formatted_tools = []
         self.logging = AgentLogger("Agent")
+        self.response = None
 
     def set_auth(self, **kwargs):
         """
@@ -72,6 +73,13 @@ class FireworksAIAgent(AbstractAgent):
 
     def run(self, agent_input, is_tool_response: Optional[bool] = False, conversation_id: Optional[str] = None) -> Response:
         self.logging.info("FireworksAIAgent:run:Running Fireworks AI Agent")
+
+        # if response object is not set, create a new one
+        if self.response is None:
+            self.response = Response()
+
+        response = self.response
+
         if not self.auth_data:
             raise ValueError("Authentication not set. Please call set_auth() before running the agent.")
 
@@ -80,9 +88,6 @@ class FireworksAIAgent(AbstractAgent):
                 raise ValueError("No conversation id provided. Please start conversation to get started.")
             else:
                 conversation_id = self.current_conversation_id
-
-        response = Response()
-        response.set_conversation_id(conversation_id)
 
         try:
             if not is_tool_response:
@@ -109,6 +114,10 @@ class FireworksAIAgent(AbstractAgent):
                     messages=messages,
                     **self.model_config
                 )
+
+            response.set_conversation_id(conversation_id)
+            response.update_usage(fireworks_response.usage.prompt_tokens,
+                                  fireworks_response.usage.completion_tokens)
 
             finish_reason = fireworks_response.choices[0].finish_reason
 

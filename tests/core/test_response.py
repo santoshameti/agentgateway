@@ -39,7 +39,8 @@ class TestResponse(unittest.TestCase):
             "type": "tool_use",
             "content": "Use tool X",
             "tools": ["tool1"],
-            "conversation_id": "test_conversation"
+            "conversation_id": "test_conversation",
+            "llm_usage": {'llm_calls':0, 'total_input_tokens':0, 'total_output_tokens':0}
         }
         self.assertEqual(self.response.to_dict(), expected_dict)
 

@@ -4,7 +4,7 @@ print(find_packages())
 
 setup(
     name="agentgateway",  # Your package name on PyPI
-    version="1.1.3",  # Update as needed
+    version="1.1.5",  # Update as needed
     description="A centralized framework to use a model of your choice for your agentic usecases.",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",

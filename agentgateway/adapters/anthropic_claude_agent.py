@@ -14,6 +14,7 @@ class AnthropicClaudeAgent(AbstractAgent):
         self.client = None
         self.formatted_tools = []
         self.logging = AgentLogger("Agent")
+        self.response = None
 
     def set_auth(self, **kwargs):
         """
@@ -70,6 +71,13 @@ class AnthropicClaudeAgent(AbstractAgent):
         self.tools[tool.name] = tool
 
     def run(self, agent_input, is_tool_response: Optional[bool] = False, conversation_id: Optional[str] = None) -> Response:
+
+        # if response object is not set, create a new one
+        if self.response is None:
+            self.response = Response()
+
+        response = self.response
+
         if conversation_id is None:
             if self.current_conversation_id is None:
                 raise ValueError("No conversation id provided. Please start conversation to get started.")
@@ -81,9 +89,6 @@ class AnthropicClaudeAgent(AbstractAgent):
             raise ValueError("Authentication not set. Please call set_auth() before running the agent.")
 
         self.add_to_conversation_history({"role":"user", "content": agent_input}, conversation_id)
-
-        response = Response()
-        response.set_conversation_id(conversation_id)
 
         self.logging.info(f"AnthropicClaudeAgent:run:invoking the selected model {self.model_id}")
         try:
@@ -105,6 +110,10 @@ class AnthropicClaudeAgent(AbstractAgent):
                     temperature=self.model_config['temperature'],
                     messages=self.get_conversation_history(conversation_id)
                 )
+
+            response.set_conversation_id(conversation_id)
+            response.update_usage(model_response.usage.input_tokens,
+                                  model_response.usage.output_tokens)
 
             self.logging.info(f"AnthropicClaudeAgent:run:model invoke completed")
             assistant_message = self.get_model_response(model_response.content)

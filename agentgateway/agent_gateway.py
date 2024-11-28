@@ -106,6 +106,8 @@ class AgentGateway:
         tool_response = False
         conversation_id = conversation_id
         self.logging.info(f"AgentGateway:run_agent:Running agent for {agent_input}")
+        # set a new response
+        self.adapter.response = Response()
         while not final_answer:
             response = self.adapter.run(agent_input, is_tool_response=tool_response, conversation_id=conversation_id)
             self.logging.info(f"AgentGateway:run_agent:Agent execution completed")
@@ -113,7 +115,7 @@ class AgentGateway:
                 self.logging.info(f"AgentGateway:run_agent:Final answer from Agent")
                 final_answer = True
                 tool_response = False
-                return response.content
+                return response
             elif response.response_type == ResponseType.TOOL_CALL:
                 self.logging.info(f"AgentGateway:run_agent:Agent responds with tool use")
                 conversation_id = response.conversation_id

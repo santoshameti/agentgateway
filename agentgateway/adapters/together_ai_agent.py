@@ -14,6 +14,7 @@ class TogetherAIAgent(AbstractAgent):
         self.api_url = "https://api.together.xyz/inference"
         self.formatted_tools = []
         self.logging = AgentLogger("Agent")
+        self.response = None
 
     def set_auth(self, **kwargs):
         """
@@ -72,6 +73,13 @@ class TogetherAIAgent(AbstractAgent):
 
     def run(self, agent_input, is_tool_response: Optional[bool] = False, conversation_id: Optional[str] = None) -> Response:
         self.logging.info("TogetherAIAgent:run:Running Together AI Agent")
+
+        # if response object is not set, create a new one
+        if self.response is None:
+            self.response = Response()
+
+        response = self.response
+
         if not self.auth_data:
             raise ValueError("Authentication not set. Please call set_auth() before running the agent.")
 
@@ -80,9 +88,6 @@ class TogetherAIAgent(AbstractAgent):
                 raise ValueError("No conversation id provided. Please start conversation to get started.")
             else:
                 conversation_id = self.current_conversation_id
-
-        response = Response()
-        response.set_conversation_id(conversation_id)
 
         try:
             if not is_tool_response:
@@ -110,8 +115,9 @@ class TogetherAIAgent(AbstractAgent):
                     **self.model_config
                 )
 
-            response_data = together_response
-
+            response.set_conversation_id(conversation_id)
+            response.update_usage(together_response.usage.prompt_tokens,
+                                  together_response.usage.completion_tokens)
 
             finish_reason = together_response.choices[0].finish_reason
 
