@@ -111,18 +111,23 @@ class GroqAgent(AbstractAgent):
                 )
 
             finish_reason = groq_response.choices[0].finish_reason
-            assistant_message = groq_response.choices[0].message
-            self.add_to_conversation_history(assistant_message, conversation_id)
+
+            if finish_reason != "tool_calls":
+                assistant_message = groq_response.choices[0].message.content
+                self.add_to_conversation_history({"role": "assistant", "content": assistant_message}, conversation_id)
+            else:
+                assistant_message = self.generate_assistant_message_for_toolcalls(groq_response.choices[0].message)
+                self.add_to_conversation_history(assistant_message, conversation_id)
 
             if finish_reason=="tool_calls":
                 self.logging.info("GroqAgent:run: function call detected")
                 response.set_response_type(ResponseType.TOOL_CALL)
-                tools = self.get_tools(assistant_message.tool_calls)
+                tools = self.get_tools(groq_response.choices[0].message.tool_calls)
                 response.set_tools(tools)
                 self.logging.info("GroqAgent:run: tools extracted")
             else:
                 response.set_response_type(ResponseType.ANSWER)
-                response.set_content(assistant_message.content)
+                response.set_content(assistant_message)
 
         except Exception as e:
             response.set_response_type(ResponseType.ERROR)
@@ -151,3 +156,37 @@ class GroqAgent(AbstractAgent):
                     "name": tool.name,
                     "content": tool_output,
                 }
+
+    def generate_assistant_message_for_toolcalls(self, chat_message):
+        """
+        Takes a ChatCompletionMessage and generates an assistant message to append.
+
+        Parameters:
+        chat_message (dict): The input ChatCompletionMessage.
+
+        Returns:
+        dict: The assistant message formatted for appending.
+        """
+        # Extracting information from the input message
+        role = chat_message.role
+        tool_calls = chat_message.tool_calls
+
+        # Create the assistant message structure
+        assistant_message = {
+            "role": role,
+            "tool_calls": []
+        }
+
+        # Process tool calls if they exist
+        for tool in tool_calls:
+            # Create a structured tool call message
+            tool_call_message = {
+                "id": tool.id,
+                "type": "function",
+                "function": {
+                    "name": tool.function.name,
+                    "arguments": tool.function.arguments
+                }
+            }
+            assistant_message["tool_calls"].append(tool_call_message)
+        return assistant_message

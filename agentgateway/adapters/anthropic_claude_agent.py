@@ -108,7 +108,8 @@ class AnthropicClaudeAgent(AbstractAgent):
 
             self.logging.info(f"AnthropicClaudeAgent:run:model invoke completed")
             assistant_message = self.get_model_response(model_response.content)
-            self.add_to_conversation_history({"role":"assistant", "content":model_response.content}, conversation_id)
+            message = {"role":"assistant", "content":model_response.model_dump()}
+            self.add_to_conversation_history(self.get_formatted_assistant_message(model_response.model_dump()), conversation_id)
             if model_response.stop_reason == "tool_use":
                 self.logging.info(f"AnthropicClaudeAgent:run: tool use detected")
                 response.set_response_type(ResponseType.TOOL_CALL)
@@ -129,6 +130,30 @@ class AnthropicClaudeAgent(AbstractAgent):
 
     def get_formatted_tool_output(self, tool, tool_output):
         return {"type": "tool_result", "tool_use_id": tool.instance_id, "content": tool_output}
+
+
+    def get_formatted_assistant_message(self, model_dump):
+        # Extract text content from the content list
+        text_contents = [
+            item
+            for item in model_dump.get('content', [])
+            if item['type'] == 'text'
+        ]
+
+        tool_uses = [
+            item for item in model_dump.get('content', [])
+            if item['type'] == 'tool_use'
+        ]
+
+        text_contents = text_contents + tool_uses
+
+        # Construct the message
+        message = {
+            "role": model_dump.get('role', 'assistant'),
+            "content": text_contents
+        }
+
+        return message
 
     def get_tools(self, response) -> []:
         self.logging.info(f"AnthropicClaudeAgent:get_tools: function called")
