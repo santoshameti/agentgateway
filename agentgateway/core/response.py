@@ -90,6 +90,7 @@ class Response:
                 "latency": latency,
                 "input_tokens": input_tokens,
                 "output_tokens": output_tokens,
+                "name": name
             }
             self.trace_details.append(detail)
 
