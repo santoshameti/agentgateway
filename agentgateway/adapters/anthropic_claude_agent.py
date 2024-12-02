@@ -1,9 +1,9 @@
 import anthropic
-import json
+import time
 from typing import List, Dict, Any, Type, Optional
 from agentgateway.core.abstract_agent import AbstractAgent
 from agentgateway.core.abstract_tool import Tool
-from agentgateway.core.response import Response, ResponseType
+from agentgateway.core.response import Response, ResponseType, EventType
 from anthropic.types import ToolUseBlock, TextBlock
 from agentgateway.utils.agent_logger import AgentLogger
 
@@ -92,6 +92,7 @@ class AnthropicClaudeAgent(AbstractAgent):
 
         self.logging.info(f"AnthropicClaudeAgent:run:invoking the selected model {self.model_id}")
         try:
+            start_time = time.perf_counter()
             if len(self.formatted_tools) > 0:
                 model_response = self.client.messages.create(
                     model=self.model_id,
@@ -111,9 +112,13 @@ class AnthropicClaudeAgent(AbstractAgent):
                     messages=self.get_conversation_history(conversation_id)
                 )
 
+            llm_latency = time.perf_counter() - start_time
             response.set_conversation_id(conversation_id)
             response.update_usage(model_response.usage.input_tokens,
                                   model_response.usage.output_tokens)
+            response.add_trace_detail(EventType.LLM_CALL, latency=llm_latency,
+                                      input_tokens=model_response.usage.input_tokens,
+                                      output_tokens=model_response.usage.output_tokens)
 
             self.logging.info(f"AnthropicClaudeAgent:run:model invoke completed")
             assistant_message = self.get_model_response(model_response.content)

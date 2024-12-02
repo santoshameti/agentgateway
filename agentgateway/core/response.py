@@ -1,11 +1,16 @@
 from enum import Enum
-from typing import Optional, Any
+from typing import Optional, Any, List, Dict
+
 
 class ResponseType(Enum):
     ANSWER = "answer"
     TOOL_CALL = "tool_use"
     ASK_USER = "ask_user"
     ERROR = "error"
+
+class EventType(Enum):
+    LLM_CALL = "llm_call"
+    TOOL_CALL = "tool_call"
 
 class Response:
     def __init__(self, 
@@ -20,10 +25,12 @@ class Response:
         self.llm_calls = 0  # Tracks the number of LLM calls
         self.total_input_tokens = 0  # Tracks total input tokens
         self.total_output_tokens = 0  # Tracks total output tokens
+        self.trace_details = [] # List to store individual call metrics
 
     def __str__(self):
         return (f"Response(type={self.response_type.value}, content={self.content}, "
-                f"conversation_id={self.conversation_id}), usage={self.get_usage_details()}")
+                f"conversation_id={self.conversation_id}), usage={self.get_usage_details()}, "
+                f"trace={self.trace_details}")
 
     def set_response_type(self, response_type: 'ResponseType'):
         self.response_type = response_type
@@ -66,6 +73,35 @@ class Response:
             "total_output_tokens": self.total_output_tokens,
         }
 
+    def add_trace_detail(self, event_type: 'EventType', latency: Optional[float] = None,
+                         input_tokens: Optional[int] = None,
+                         output_tokens: Optional[int] = None, name: Optional[str] = None):
+        """
+        Adds a trace detail if at least one metric is provided.
+
+        :param event_type: The type of event (LLM_CALL or TOOL_CALL).
+        :param latency: Time taken for the call in seconds.
+        :param input_tokens: Number of input tokens for the call.
+        :param output_tokens: Number of output tokens for the call.
+        """
+        if event_type and (latency is not None or input_tokens is not None or output_tokens is not None or name is not None):
+            detail = {
+                "event_type": event_type.value,
+                "latency": latency,
+                "input_tokens": input_tokens,
+                "output_tokens": output_tokens,
+            }
+            self.trace_details.append(detail)
+
+    def get_trace_details(self) -> List[Dict[str, Any]]:
+        """
+        Returns the trace details.
+
+        :return: A list of dictionaries containing trace metrics.
+        """
+        return self.trace_details
+
+
     def to_dict(self):
         return {
             "type": self.response_type.value,
@@ -73,5 +109,6 @@ class Response:
             "tools": self.tools,
             "conversation_id": self.conversation_id,
             "llm_usage": self.get_usage_details(),
+            "trace_details": self.trace_details
         }
 

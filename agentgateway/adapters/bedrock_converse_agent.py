@@ -1,11 +1,11 @@
-import json
+import json, time
 from typing import List, Dict, Any, Optional
 import boto3
 from botocore.exceptions import ClientError
 
 from agentgateway.core.abstract_agent import AbstractAgent
 from agentgateway.core.abstract_tool import Tool
-from agentgateway.core.response import Response, ResponseType
+from agentgateway.core.response import Response, ResponseType, EventType
 from agentgateway.utils.agent_logger import AgentLogger
 
 class BedrockConverseAgent(AbstractAgent):
@@ -128,13 +128,17 @@ class BedrockConverseAgent(AbstractAgent):
                     }
                 }
 
+            start_time = time.perf_counter()
             bedrock_response = self.client.converse(**body)
+            llm_latency = time.perf_counter() - start_time
             usage = bedrock_response.get('usage', {})
             input_tokens = usage.get('inputTokens', 0)
             output_tokens = usage.get('outputTokens', 0)
 
             response.set_conversation_id(conversation_id)
             response.update_usage(input_tokens, output_tokens)
+            response. add_trace_detail(EventType.LLM_CALL, latency=llm_latency, input_tokens=input_tokens,
+                                       output_tokens=output_tokens)
 
             assistant_message = bedrock_response['output']['message']['content']
             self.add_to_conversation_history({"role":"assistant", "content":assistant_message}, conversation_id)

@@ -1,11 +1,11 @@
-import json
+import json, time
 from typing import List, Dict, Any, Optional
 
 import openai
 from openai.types.chat import ChatCompletionMessageToolCall
 from agentgateway.core.abstract_agent import AbstractAgent
 from agentgateway.core.abstract_tool import Tool
-from agentgateway.core.response import Response, ResponseType
+from agentgateway.core.response import Response, ResponseType, EventType
 from agentgateway.utils.agent_logger import AgentLogger
 
 class FireworksAIAgent(AbstractAgent):
@@ -100,6 +100,7 @@ class FireworksAIAgent(AbstractAgent):
             ]
             messages.extend(self.get_conversation_history(conversation_id))
 
+            start_time = time.perf_counter()
             if len(self.formatted_tools) > 0:
                 fireworks_response = self.client.chat.completions.create(
                     model=self.model_id,
@@ -114,10 +115,12 @@ class FireworksAIAgent(AbstractAgent):
                     messages=messages,
                     **self.model_config
                 )
-
+            llm_latency = time.perf_counter() - start_time
             response.set_conversation_id(conversation_id)
             response.update_usage(fireworks_response.usage.prompt_tokens,
                                   fireworks_response.usage.completion_tokens)
+            response.add_trace_detail(EventType.LLM_CALL, latency=llm_latency, input_tokens=fireworks_response.usage.prompt_tokens,
+                                      output_tokens=fireworks_response.usage.completion_tokens)
 
             finish_reason = fireworks_response.choices[0].finish_reason
 

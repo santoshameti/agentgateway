@@ -1,9 +1,10 @@
+import time
 from typing import Union, List, Optional
 from enum import Enum
 from agentgateway.core.abstract_agent import AbstractAgent
 from agentgateway.core.prompt import Prompt
 from agentgateway.core.abstract_tool import Tool
-from agentgateway.core.response import Response, ResponseType
+from agentgateway.core.response import Response, ResponseType, EventType
 from agentgateway.utils.agent_logger import AgentLogger
 from agentgateway.adapters.anthropic_claude_agent import AnthropicClaudeAgent
 from agentgateway.adapters.openai_gpt_agent import OpenAIGPTAgent
@@ -127,7 +128,10 @@ class AgentGateway:
                     self.logging.info(f"AgentGateway:run_agent: executing tool {response_tool.name} and id {response_tool.instance_id}")
                     if response_tool.name in self.tools:
                         self.logging.info(f"AgentGateway:run_agent: setting the auth params for the agents to execute")
+                        start = time.perf_counter()
                         tool_output = response_tool.execute()
+                        tool_latency = time.perf_counter() - start
+                        response.add_trace_detail(EventType.TOOL_CALL, latency=tool_latency, name=response_tool.name)
                         formatted_tool_output = self.adapter.get_formatted_tool_output(tool=response_tool,tool_output=tool_output)
                         tool_results.append(formatted_tool_output)
                         self.logging.info(f"AgentGateway:run_agent: {response_tool.get_name()} tool output: {tool_output}")
