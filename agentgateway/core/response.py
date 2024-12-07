@@ -74,8 +74,9 @@ class Response:
         }
 
     def add_trace_detail(self, event_type: 'EventType', latency: Optional[float] = None,
-                         input_tokens: Optional[int] = None,
-                         output_tokens: Optional[int] = None, name: Optional[str] = None):
+                         input_tokens: Optional[int] = None, output_tokens: Optional[int] = None,
+                         name: Optional[str] = None, start_time: Optional[str] = None,
+                         end_time: Optional[str] = None):
         """
         Adds a trace detail if at least one metric is provided.
 
@@ -83,14 +84,21 @@ class Response:
         :param latency: Time taken for the call in seconds.
         :param input_tokens: Number of input tokens for the call.
         :param output_tokens: Number of output tokens for the call.
+        :param name: Name of the event (e.g., tool name).
+        :param start_time: Optional start time of the event (ISO 8601 string).
+        :param end_time: Optional end time of the event (ISO 8601 string).
         """
-        if event_type and (latency is not None or input_tokens is not None or output_tokens is not None or name is not None):
+        if event_type and (latency is not None or input_tokens is not None or
+                           output_tokens is not None or name is not None or
+                           start_time is not None or end_time is not None):
             detail = {
                 "event_type": event_type.value,
                 "latency": latency,
                 "input_tokens": input_tokens,
                 "output_tokens": output_tokens,
-                "name": name
+                "name": name,
+                "start_time": start_time,
+                "end_time": end_time
             }
             self.trace_details.append(detail)
 
@@ -102,7 +110,6 @@ class Response:
         """
         return self.trace_details
 
-
     def to_dict(self):
         return {
             "type": self.response_type.value,
@@ -110,6 +117,6 @@ class Response:
             "tools": self.tools,
             "conversation_id": self.conversation_id,
             "llm_usage": self.get_usage_details(),
-            "trace_details": self.trace_details
+            "trace_details": self.trace_details,
         }
 

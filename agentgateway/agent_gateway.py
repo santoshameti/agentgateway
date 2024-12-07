@@ -1,4 +1,5 @@
 import time
+from datetime import datetime, timezone
 from typing import Union, List, Optional
 from enum import Enum
 from agentgateway.core.abstract_agent import AbstractAgent
@@ -128,10 +129,12 @@ class AgentGateway:
                     self.logging.info(f"AgentGateway:run_agent: executing tool {response_tool.name} and id {response_tool.instance_id}")
                     if response_tool.name in self.tools:
                         self.logging.info(f"AgentGateway:run_agent: setting the auth params for the agents to execute")
+                        start_time = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
                         start = time.perf_counter()
                         tool_output = response_tool.execute()
+                        end_time = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
                         tool_latency = time.perf_counter() - start
-                        response.add_trace_detail(EventType.TOOL_CALL, latency=tool_latency, name=response_tool.name)
+                        response.add_trace_detail(EventType.TOOL_CALL, latency=tool_latency, name=response_tool.name, start_time=start_time,end_time=end_time)
                         formatted_tool_output = self.adapter.get_formatted_tool_output(tool=response_tool,tool_output=tool_output)
                         tool_results.append(formatted_tool_output)
                         self.logging.info(f"AgentGateway:run_agent: {response_tool.get_name()} tool output: {tool_output}")

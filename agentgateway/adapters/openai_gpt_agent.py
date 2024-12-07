@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from openai import OpenAI, ChatCompletion
 import json, traceback, time
 from typing import List, Dict, Any, Optional
@@ -109,6 +111,7 @@ class OpenAIGPTAgent(AbstractAgent):
 
         self.logging.info(f"OpenAIAgent:run:invoking the selected model {self.model_id}")
         try:
+            start_time = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
             start = time.perf_counter()
             if len(self.tools) > 0:
                 model_response = self.client.chat.completions.create(
@@ -125,13 +128,14 @@ class OpenAIGPTAgent(AbstractAgent):
                     max_tokens=self.model_config['max_tokens'],
                     temperature=self.model_config['temperature']
                 )
+            end_time = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
             latency = time.perf_counter() - start
             response.set_conversation_id(conversation_id)
             response.update_usage(model_response.usage.prompt_tokens,
                                   model_response.usage.completion_tokens)
             response.add_trace_detail(EventType.LLM_CALL, input_tokens=model_response.usage.prompt_tokens,
                                       output_tokens=model_response.usage.completion_tokens,
-                                      latency=latency)
+                                      latency=latency, start_time=start_time, end_time=end_time)
 
             self.logging.info(f"OpenAIAgent:run:model invoke completed")
             finish_reason = model_response.choices[0].finish_reason
