@@ -8,25 +8,27 @@ class TestSentimentAnalysisTool(unittest.TestCase):
         self.tool = SentimentAnalysisTool()
         self.tool.set_auth(api_key="dummy_key")
 
-    @patch('agentgateway.tools.sentiment_analysis_tool.Anthropic')
-    def test_sentiment_analysis(self, mock_anthropic):
-        # Mock the Anthropic client and its methods
-        mock_client = MagicMock()
-        mock_anthropic.return_value = mock_client
-        mock_response = MagicMock()
-        mock_response.content = [MagicMock(text="Sentiment: Positive\nScore: 0.8")]
-        mock_client.messages.create.return_value = mock_response
+    @patch('agentgateway.tools.sentiment_analysis_tool.TextBlob')
+    def test_sentiment_analysis(self, mock_textblob):
+        # Mock the TextBlob object and its sentiment attribute
+        mock_blob = MagicMock()
+        mock_blob.sentiment.polarity = 0.8  # Set a mock polarity value for the test
+        mock_textblob.return_value = mock_blob
 
         text = "I love this product! It's amazing and works perfectly."
+        self.tool = SentimentAnalysisTool()  # Initialize the tool
         self.tool.set_parameters({"text": text})
         result = self.tool.execute()
         result = json.loads(result)
 
+        # Assert the result contains expected keys and values
         self.assertIn("sentiment", result)
         self.assertIn("score", result)
         self.assertEqual(result["sentiment"], "positive")
         self.assertEqual(result["score"], 0.8)
-        mock_client.messages.create.assert_called_once()
+
+        # Verify that TextBlob was called with the correct text
+        mock_textblob.assert_called_once_with(text)
 
     def test_missing_api_key(self):
         self.tool.auth_data = {}  # Remove API key

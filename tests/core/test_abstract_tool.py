@@ -72,8 +72,7 @@ class TestAbstractTool(unittest.TestCase):
         self.assertEqual(self.tool.get_parameter("param2"), 42)
 
     def test_get_nonexistent_parameter(self):
-        with self.assertRaises(KeyError):
-            self.tool.get_parameter("nonexistent")
+            self.assertEqual(self.tool.get_parameter("nonexistent"), None)
 
     def test_set_and_get_instance_id(self):
         self.tool.set_instance_id("instance_1")

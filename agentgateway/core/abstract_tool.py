@@ -98,7 +98,7 @@ class Tool(ABC):
         :raises KeyError: If the parameter key does not exist.
         """
         if key not in self._parameters:
-            raise KeyError(f"Parameter '{key}' not found")
+            return None
         return self._parameters[key]
 
     def set_parameter(self, key: str, value: Any):

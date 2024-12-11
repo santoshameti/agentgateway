@@ -11,3 +11,6 @@ requests~=2.32.3
 beautifulsoup4~=4.12.3
 PyYAML~=6.0.2
 redis~=5.1.1
+agentgateway~=1.1.0
+setuptools~=75.4.0
+textblob~=0.18.0.post0
